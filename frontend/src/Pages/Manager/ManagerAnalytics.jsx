@@ -5,6 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts'; // Recharts for charting
 import { Card, CardContent, CardHeader, Typography, Box, CircularProgress } from '@mui/material'; // Material-UI for card layout
+import DashboardShimmer from '../../Compontes/DashboardShimmer';
 
 const COLORS = ['#0088FE', '#FFBB28', '#00C49F', '#FF8042', '#AF19FF']; // Colors for charts
 
@@ -94,10 +95,7 @@ const ManagerAnalytics = () => {
 
   if (isLoading) {
     return (
-      <Box sx={{ p: 4, textAlign: 'center', fontSize: '1.25rem', fontWeight: 'bold' }}>
-        <CircularProgress size={24} sx={{ mr: 2 }} />
-        Loading analytics data...
-      </Box>
+      <DashboardShimmer/>
     );
   }
 
@@ -106,7 +104,8 @@ const ManagerAnalytics = () => {
   }
 
   return (
-    <Box sx={{ p: 4, bgcolor: 'background.default', minHeight: '100vh' }}>
+    <div className="font-roboto">
+    <Box  sx={{ p: 4, bgcolor: 'background.default', minHeight: '100vh' }}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 4, color: 'text.primary' }}>
         Team Analytics
       </Typography>
@@ -172,6 +171,7 @@ const ManagerAnalytics = () => {
         </CardContent>
       </Card>
     </Box>
+    </div>
   );
 };
 

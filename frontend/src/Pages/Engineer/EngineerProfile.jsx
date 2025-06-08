@@ -21,36 +21,27 @@ import {
   TableRow,    
   Paper       
 } from '@mui/material';
+import Shimmer from '../../Compontes/Shimmer';
+import DashboardShimmer from '../../Compontes/DashboardShimmer';
+import BoxShimmer from '../../Compontes/BoxShimmer';
 
 const EngineerProfile = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  // Select selectedEngineer, isLoading, error from the 'data' slice
   const { selectedEngineer, isLoading, error } = useSelector((state) => state.data);
   const { user: currentUser } = useSelector((state) => state.auth);
   
-// console.log(String(currentUser?._id), "selectedEngineer:", selectedEngineer?._id);
 
   useEffect(() => {
     if (id) {
-      // Dispatch the thunk to fetch engineer details (which includes assignments)
       dispatch(fetchEngineerById(id));
     }
   }, [dispatch, id]);
 
-  // --- DEBUG LOGS ---
-  useEffect(() => {
-    if (currentUser && selectedEngineer) {
-      console.log("currentUser.id:", currentUser.id);
-      console.log("selectedEngineer._id:", selectedEngineer._id);
-      console.log("Are IDs different?", String(currentUser.id) !== String(selectedEngineer._id));
-      console.log("currentUser.role:", currentUser.role);
-    }
-  }, [currentUser, selectedEngineer]);
-  // --- END DEBUG LOGS ---
+
 
   if (isLoading) {
-    return <Box sx={{ p: 4, textAlign: 'center', fontSize: '1.25rem', fontWeight: 'bold' }}>Loading engineer profile...</Box>;
+    return <DashboardShimmer/>;
   }
 
   if (error) {
@@ -67,7 +58,7 @@ const EngineerProfile = () => {
   }
 
   return (
-    <Box className="container mx-auto p-6 md:p-10">
+    <Box className="container font-roboto mx-auto p-6 md:p-10">
       <Card sx={{ maxWidth: '900px', margin: '0 auto', boxShadow: 3, borderRadius: 2 }}>
         <CardHeader
           title={<Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: 'text.primary' }}>{selectedEngineer.name}</Typography>}

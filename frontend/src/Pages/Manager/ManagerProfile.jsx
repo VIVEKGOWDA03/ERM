@@ -12,6 +12,7 @@ import {
 
 const ManagerProfile = () => {
   const { user: currentUser } = useSelector((state) => state.auth);
+  // console.log(currentUser);
 
   if (!currentUser || currentUser.role !== "manager") {
     return (
@@ -22,133 +23,101 @@ const ManagerProfile = () => {
   }
 
   return (
-    <Box className="container mx-auto p-6 md:p-10">
-      <Card
-        sx={{
-          maxWidth: "900px",
-          margin: "0 auto",
-          boxShadow: 3,
-          borderRadius: 2,
-        }}
-      >
-        <CardHeader
-          title={
-            <Typography
-              variant="h4"
-              component="div"
-              sx={{ fontWeight: "bold", color: "text.primary" }}
-            >
-              My Profile
-            </Typography>
-          }
-          subheader={
-            <Typography variant="body1" sx={{ color: "text.secondary" }}>
-              Details for {currentUser.name}
-            </Typography>
-          }
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-100 font-roboto p-4 sm:p-6 md:p-10">
+      <Box className="max-w-5xl mx-auto">
+        <Card
           sx={{
-            bgcolor: "background.paper",
-            borderBottom: "1px solid",
-            borderColor: "grey.300",
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
-            padding: 3,
+            borderRadius: 4,
+            boxShadow: 6,
+            overflow: "hidden",
           }}
-        />
-        <CardContent sx={{ padding: 3, "& > *:not(:last-child)": { mb: 3 } }}>
-          <Box>
+        >
+          <CardHeader
+            title={
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: "bold",
+                  color: "primary.main",
+                  fontSize: { xs: "1.5rem", md: "2rem" },
+                }}
+              >
+                Manager Profile
+              </Typography>
+            }
+            subheader={
+              <Typography
+                variant="subtitle1"
+                sx={{ color: "text.secondary", fontSize: "1rem" }}
+              >
+                Welcome, {currentUser.name}
+              </Typography>
+            }
+            sx={{
+              backgroundColor: "background.paper",
+              borderBottom: "1px solid",
+              borderColor: "grey.300",
+              px: 4,
+              py: 3,
+            }}
+          />
+
+          <CardContent sx={{ px: 4, py: 3 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {[
+                ["Name", currentUser.name],
+                ["Email", currentUser.email],
+                [
+                  "Role",
+                  currentUser.role
+                    ? currentUser.role.charAt(0).toUpperCase() +
+                      currentUser.role.slice(1)
+                    : "N/A",
+                ],
+                ["Department", currentUser.department || "N/A"],
+                [
+                  "Seniority",
+                  currentUser.seniority
+                    ? currentUser.seniority.charAt(0).toUpperCase() +
+                      currentUser.seniority.slice(1)
+                    : "N/A",
+                ],
+              ].map(([label, value]) => (
+                <Box key={label}>
+                  <Typography
+                    variant="caption"
+                    display="block"
+                    sx={{ color: "text.secondary", fontSize: "0.875rem" }}
+                    gutterBottom
+                  >
+                    {label}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: 500,
+                      color: "text.primary",
+                      fontSize: "1rem",
+                    }}
+                  >
+                    {value}
+                  </Typography>
+                </Box>
+              ))}
+            </div>
+
+            <Divider sx={{ my: 4 }} />
+
             <Typography
-              variant="caption"
-              display="block"
-              color="text.secondary"
-              gutterBottom
+              variant="body2"
+              sx={{ color: "text.secondary", fontStyle: "italic" }}
             >
-              Name
+              More manager-specific details will be available here soon.
             </Typography>
-            <Typography
-              variant="body1"
-              sx={{ fontWeight: "medium", color: "text.primary" }}
-            >
-              {currentUser.name}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography
-              variant="caption"
-              display="block"
-              color="text.secondary"
-              gutterBottom
-            >
-              Email
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{ fontWeight: "medium", color: "text.primary" }}
-            >
-              {currentUser.email}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography
-              variant="caption"
-              display="block"
-              color="text.secondary"
-              gutterBottom
-            >
-              Role
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{ fontWeight: "medium", color: "text.primary" }}
-            >
-              {currentUser.role?.charAt(0)?.toUpperCase() +
-                currentUser.role?.slice(1) || "N/A"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography
-              variant="caption"
-              display="block"
-              color="text.secondary"
-              gutterBottom
-            >
-              Department
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{ fontWeight: "medium", color: "text.primary" }}
-            >
-              {currentUser.department || "N/A"}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography
-              variant="caption"
-              display="block"
-              color="text.secondary"
-              gutterBottom
-            >
-              Seniority
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{ fontWeight: "medium", color: "text.primary" }}
-            >
-              {currentUser.seniority?.charAt(0)?.toUpperCase() +
-                currentUser.seniority?.slice(1) || "N/A"}
-            </Typography>
-          </Box>
-          <Divider sx={{ my: 2 }} />
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ fontStyle: "italic" }}
-          >
-            {/* More manager-specific details can be added here. */}
-          </Typography>
-        </CardContent>
-      </Card>
-    </Box>
+          </CardContent>
+        </Card>
+      </Box>
+    </div>
   );
 };
 

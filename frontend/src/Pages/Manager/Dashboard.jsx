@@ -9,6 +9,7 @@ import { fetchAllEngineers } from "../../store/Slice";
 import { fetchAllProjects } from "../../store/Slice/ProjectsSlice";
 import { fetchAllAssignments } from "../../store/Slice/AssignmentSlice";
 import ManagerAnalytics from "./ManagerAnalytics";
+import DashboardShimmer from "../../Compontes/DashboardShimmer";
 
 // --- NO SHADCN IMPORTS HERE ---
 
@@ -39,11 +40,7 @@ const ManagerDashboard = () => {
   // }
 
   if (isLoading) {
-    return (
-      <div className="p-4 text-center text-gray-700 bg-gray-50 rounded-md">
-        Loading dashboard data...
-      </div>
-    );
+    return <DashboardShimmer />;
   }
 
   if (error) {
@@ -55,19 +52,13 @@ const ManagerDashboard = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-full">
+    <div className="p-6  bg-gradient-to-br font-roboto rounded-[20px]  from-purple-800 to-gray-900 min-h-full">
       {" "}
-      {/* Added bg-gray-50 for overall page */}
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">
-        Manager Dashboard
-      </h1>
-      {/* Quick Stats Cards */}
+      <h1 className="text-3xl font-bold text-white mb-6">Manager Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {" "}
-        {/* Increased gap for better spacing */}
         <CustomCard className="p-6">
           {" "}
-          {/* Increased padding for cards */}
           <h3 className="text-lg font-semibold text-gray-700">
             Total Engineers
           </h3>
@@ -92,8 +83,7 @@ const ManagerDashboard = () => {
           </p>
         </CustomCard>
       </div>
-      <ManagerAnalytics/>
-
+      <ManagerAnalytics />
       {/* Engineers Overview */}
       <EnginnersOverview
         users={users}

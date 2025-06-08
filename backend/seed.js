@@ -1,29 +1,20 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs'); // For hashing passwords
-const User = require('./models/User'); // Adjust path as per your project structure (e.g., ../models/User)
-const Project = require('./models/project'); // Adjust path as per your project structure
-const Assignment = require('./models/assignment'); // Adjust path as per your project structure
+const bcrypt = require('bcryptjs');
+const User = require('./models/User');
+const Project = require('./models/Project');
+const Assignment = require('./models/Assignment');
 
-// --- IMPORTANT: CONFIGURE YOUR MONGODB CONNECTION STRING HERE ---
-// Ensure you replace 'engineering_resource_db' with your actual database name if it's different
 const mongoURI = 'mongodb+srv://vivekck12343:dmTLAoVQyOpoZvL3@cluster0.gmwvhwg.mongodb.net/test'; 
 
-// Function to seed the database
 const seedDatabase = async () => {
     try {
-        // Connect to MongoDB
         await mongoose.connect(mongoURI, {
-            // useNewUrlParser and useUnifiedTopology are deprecated in newer Mongoose versions,
-            // but harmless to keep. The driver will ignore them.
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
         console.log('MongoDB connected for seeding...');
 
-        // --- IMPORTANT: Clear existing data and drop collections to remove old indexes ---
         console.log('Dropping existing collections and clearing data...');
-        // Drop collections to ensure all existing indexes (including old ones like userName_1) are removed
-        // The .catch() handles cases where the collection might not exist yet, preventing errors on first run.
         await User.collection.drop().catch(err => {
             if (err.code !== 26) console.error(`Error dropping User collection: ${err.message}`);
         });
@@ -35,24 +26,31 @@ const seedDatabase = async () => {
         });
         console.log('Existing collections dropped.');
 
-
-        // --- 1. Create Users (Managers and Engineers) ---
-        // Hash a common password for all users for simplicity in seeding
-        const hashedPassword = await bcrypt.hash('password123', 12); // Password will be 'password123' for all seeded users
+        const hashedPassword = await bcrypt.hash('password123', 12);
 
         const usersData = [
-            // Manager
+            // Manager Accounts
             {
                 name: 'Alice Johnson',
                 email: 'alice.j@example.com',
                 password: hashedPassword,
                 role: 'manager',
-                skills: [], // Managers don't typically have engineering skills for assignments
+                skills: [],
                 seniority: 'senior',
-                maxCapacity: 100, // Manager capacity is generally irrelevant for resource allocation
+                maxCapacity: 100,
                 department: 'Engineering Management'
             },
-            // Engineers (Full-time & Part-time, various skills)
+            {
+                name: 'Priya Sharma',
+                email: 'priya.s@example.com',
+                password: hashedPassword,
+                role: 'manager',
+                skills: [],
+                seniority: 'mid',
+                maxCapacity: 100,
+                department: 'Product Management'
+            },
+            // Engineer Accounts
             {
                 name: 'Bob Smith',
                 email: 'bob.s@example.com',
@@ -60,7 +58,7 @@ const seedDatabase = async () => {
                 role: 'engineer',
                 skills: ['React', 'Node.js', 'JavaScript', 'Frontend', 'GraphQL'],
                 seniority: 'mid',
-                maxCapacity: 100, // Full-time engineer
+                maxCapacity: 100,
                 department: 'Frontend'
             },
             {
@@ -70,7 +68,7 @@ const seedDatabase = async () => {
                 role: 'engineer',
                 skills: ['QA', 'Manual Testing', 'Automation', 'JIRA'],
                 seniority: 'junior',
-                maxCapacity: 50, // Part-time engineer (50% capacity)
+                maxCapacity: 50,
                 department: 'Quality Assurance'
             },
             {
@@ -80,7 +78,7 @@ const seedDatabase = async () => {
                 role: 'engineer',
                 skills: ['Python', 'Django', 'AWS', 'Docker', 'SQL', 'Data Engineering'],
                 seniority: 'senior',
-                maxCapacity: 100, // Full-time engineer
+                maxCapacity: 100,
                 department: 'Backend'
             },
             {
@@ -90,7 +88,7 @@ const seedDatabase = async () => {
                 role: 'engineer',
                 skills: ['React', 'TypeScript', 'UI/UX', 'Figma'],
                 seniority: 'mid',
-                maxCapacity: 100, // Full-time engineer
+                maxCapacity: 100,
                 department: 'Frontend'
             },
             {
@@ -100,25 +98,66 @@ const seedDatabase = async () => {
                 role: 'engineer',
                 skills: ['Go', 'Kubernetes', 'Microservices', 'Cloud Architecture'],
                 seniority: 'senior',
-                maxCapacity: 100, // Full-time engineer
+                maxCapacity: 100,
                 department: 'DevOps'
+            },
+            {
+                name: 'Rohan Gupta',
+                email: 'rohan.g@example.com',
+                password: hashedPassword,
+                role: 'engineer',
+                skills: ['Java', 'Spring Boot', 'Microservices', 'REST APIs'],
+                seniority: 'mid',
+                maxCapacity: 100,
+                department: 'Backend'
+            },
+            {
+                name: 'Neha Singh',
+                email: 'neha.s@example.com',
+                password: hashedPassword,
+                role: 'engineer',
+                skills: ['Angular', 'TypeScript', 'RxJS', 'Frontend Testing'],
+                seniority: 'junior',
+                maxCapacity: 100,
+                department: 'Frontend'
+            },
+            {
+                name: 'Ajay Kumar',
+                email: 'ajay.k@example.com',
+                password: hashedPassword,
+                role: 'engineer',
+                skills: ['React Native', 'Mobile Development', 'Firebase'],
+                seniority: 'mid',
+                maxCapacity: 50, // Part-time
+                department: 'Mobile'
+            },
+            {
+                name: 'Deepa Rao',
+                email: 'deepa.r@example.com',
+                password: hashedPassword,
+                role: 'engineer',
+                skills: ['Python', 'Machine Learning', 'TensorFlow', 'Data Science'],
+                seniority: 'senior',
+                maxCapacity: 100,
+                department: 'AI/ML'
             }
         ];
 
-        // Insert users into the database
         const createdUsers = await User.insertMany(usersData);
         console.log('Users seeded:', createdUsers.map(u => ({ name: u.name, role: u.role, _id: u._id })));
 
-        // Retrieve the created user objects for their _id
         const alice = createdUsers.find(user => user.name === 'Alice Johnson');
+        const priya = createdUsers.find(user => user.name === 'Priya Sharma');
         const bob = createdUsers.find(user => user.name === 'Bob Smith');
         const carol = createdUsers.find(user => user.name === 'Carol White');
         const david = createdUsers.find(user => user.name === 'David Green');
         const eve = createdUsers.find(user => user.name === 'Eve Brown');
         const frank = createdUsers.find(user => user.name === 'Frank Miller');
+        const rohan = createdUsers.find(user => user.name === 'Rohan Gupta');
+        const neha = createdUsers.find(user => user.name === 'Neha Singh');
+        const ajay = createdUsers.find(user => user.name === 'Ajay Kumar');
+        const deepa = createdUsers.find(user => user.name === 'Deepa Rao');
 
-
-        // --- 2. Create Projects ---
         const projectsData = [
             {
                 name: 'E-commerce Platform Revamp',
@@ -128,7 +167,7 @@ const seedDatabase = async () => {
                 requiredSkills: ['React', 'Node.js', 'MongoDB', 'AWS'],
                 teamSize: 5,
                 status: 'active',
-                managerId: alice._id // Assign to Alice
+                managerId: alice._id
             },
             {
                 name: 'Internal Reporting Tool',
@@ -138,17 +177,17 @@ const seedDatabase = async () => {
                 requiredSkills: ['Python', 'SQL', 'Data Visualization', 'Dashboards'],
                 teamSize: 3,
                 status: 'planning',
-                managerId: alice._id // Assign to Alice
+                managerId: alice._id
             },
             {
                 name: 'Mobile App Performance Optimization',
-                description: 'Improve load times and responsiveness for the existing mobile application (completed).',
+                description: 'Improve load times and responsiveness for the existing mobile application.',
                 startDate: new Date('2024-11-01T00:00:00Z'),
-                endDate: new Date('2025-02-28T23:59:59Z'), // Already completed
+                endDate: new Date('2025-02-28T23:59:59Z'),
                 requiredSkills: ['React Native', 'Performance Tuning', 'Mobile Development'],
                 teamSize: 4,
                 status: 'completed',
-                managerId: alice._id // Assign to Alice
+                managerId: alice._id
             },
             {
                 name: 'Cloud Migration Project',
@@ -158,28 +197,57 @@ const seedDatabase = async () => {
                 requiredSkills: ['GCP', 'DevOps', 'Kubernetes', 'Networking', 'Security'],
                 teamSize: 4,
                 status: 'planning',
-                managerId: alice._id // Assign to Alice
+                managerId: priya._id
+            },
+            {
+                name: 'AI-Powered Chatbot',
+                description: 'Develop a conversational AI chatbot for customer support.',
+                startDate: new Date('2025-07-01T00:00:00Z'),
+                endDate: new Date('2026-01-31T23:59:59Z'),
+                requiredSkills: ['Python', 'Machine Learning', 'NLP', 'TensorFlow'],
+                teamSize: 3,
+                status: 'active',
+                managerId: priya._id
+            },
+            {
+                name: 'FinTech Dashboard Redesign',
+                description: 'Modernize and enhance the user experience of an existing financial dashboard.',
+                startDate: new Date('2025-05-20T00:00:00Z'),
+                endDate: new Date('2025-11-15T23:59:59Z'),
+                requiredSkills: ['Angular', 'TypeScript', 'UI/UX', 'Data Visualization'],
+                teamSize: 4,
+                status: 'active',
+                managerId: alice._id
+            },
+            {
+                name: 'Healthcare Data Analytics',
+                description: 'Build a secure platform for analyzing healthcare data to identify trends.',
+                startDate: new Date('2025-08-01T00:00:00Z'),
+                endDate: new Date('2026-03-31T23:59:59Z'),
+                requiredSkills: ['Java', 'Spring Boot', 'Big Data', 'Security'],
+                teamSize: 5,
+                status: 'planning',
+                managerId: priya._id
             }
         ];
 
-        // Insert projects into the database
         const createdProjects = await Project.insertMany(projectsData);
         console.log('Projects seeded:', createdProjects.map(p => ({ name: p.name, _id: p._id })));
 
-        // Retrieve the created project objects for their _id
         const ecommerceProject = createdProjects.find(p => p.name === 'E-commerce Platform Revamp');
         const internalToolProject = createdProjects.find(p => p.name === 'Internal Reporting Tool');
         const mobileAppProject = createdProjects.find(p => p.name === 'Mobile App Performance Optimization');
         const cloudMigrationProject = createdProjects.find(p => p.name === 'Cloud Migration Project');
+        const aiChatbotProject = createdProjects.find(p => p.name === 'AI-Powered Chatbot');
+        const fintechProject = createdProjects.find(p => p.name === 'FinTech Dashboard Redesign');
+        const healthcareProject = createdProjects.find(p => p.name === 'Healthcare Data Analytics');
 
-
-        // --- 3. Create Assignments ---
         const assignmentsData = [
-            // Bob Smith (mid, 100% capacity)
+            // Assignments for Bob Smith
             {
                 engineerId: bob._id,
                 projectId: ecommerceProject._id,
-                allocationPercentage: 70, // 70% allocated
+                allocationPercentage: 70,
                 startDate: new Date('2025-01-15T00:00:00Z'),
                 endDate: new Date('2025-07-31T23:59:59Z'),
                 role: 'Lead Frontend Developer'
@@ -187,20 +255,21 @@ const seedDatabase = async () => {
             {
                 engineerId: bob._id,
                 projectId: internalToolProject._id,
-                allocationPercentage: 30, // Puts Bob at 100% total (70+30)
+                allocationPercentage: 30,
                 startDate: new Date('2025-03-01T00:00:00Z'),
                 endDate: new Date('2025-09-30T23:59:59Z'),
                 role: 'UI Contributor'
             },
-            // Carol White (junior, 50% capacity - part-time)
+            // Assignments for Carol White
             {
                 engineerId: carol._id,
                 projectId: ecommerceProject._id,
-                allocationPercentage: 50, // Carol is part-time, so 50% fills her max capacity
+                allocationPercentage: 50,
                 startDate: new Date('2025-02-01T00:00:00Z'),
                 endDate: new Date('2025-06-30T23:59:59Z'),
                 role: 'QA Engineer'
             },
+            // Assignments for David Green
             {
                 engineerId: david._id,
                 projectId: internalToolProject._id,
@@ -211,13 +280,13 @@ const seedDatabase = async () => {
             },
             {
                 engineerId: david._id,
-                projectId: mobileAppProject._id, // This is a completed project, good for historical data
+                projectId: mobileAppProject._id,
                 allocationPercentage: 40,
                 startDate: new Date('2024-11-01T00:00:00Z'),
                 endDate: new Date('2025-02-28T23:59:59Z'),
                 role: 'Performance Lead'
             },
-            // Eve Brown (mid, 100% capacity)
+            // Assignments for Eve Brown
             {
                 engineerId: eve._id,
                 projectId: ecommerceProject._id,
@@ -229,12 +298,12 @@ const seedDatabase = async () => {
             {
                 engineerId: eve._id,
                 projectId: cloudMigrationProject._id,
-                allocationPercentage: 20, // Puts Eve at 100% total (80+20) with a future project
+                allocationPercentage: 20,
                 startDate: new Date('2025-06-10T00:00:00Z'),
                 endDate: new Date('2025-10-31T23:59:59Z'),
                 role: 'UI Support'
             },
-             // Frank Miller (senior, 100% capacity) - partially allocated
+             // Assignments for Frank Miller
             {
                 engineerId: frank._id,
                 projectId: cloudMigrationProject._id,
@@ -242,10 +311,53 @@ const seedDatabase = async () => {
                 startDate: new Date('2025-06-10T00:00:00Z'),
                 endDate: new Date('2025-12-20T23:59:59Z'),
                 role: 'DevOps Lead'
+            },
+            // Assignments for Rohan Gupta
+            {
+                engineerId: rohan._id,
+                projectId: healthcareProject._id,
+                allocationPercentage: 75,
+                startDate: new Date('2025-08-01T00:00:00Z'),
+                endDate: new Date('2026-03-31T23:59:59Z'),
+                role: 'Java Backend Lead'
+            },
+            {
+                engineerId: rohan._id,
+                projectId: aiChatbotProject._id,
+                allocationPercentage: 25,
+                startDate: new Date('2025-07-15T00:00:00Z'),
+                endDate: new Date('2025-12-31T23:59:59Z'),
+                role: 'API Integration Specialist'
+            },
+            // Assignments for Neha Singh
+            {
+                engineerId: neha._id,
+                projectId: fintechProject._id,
+                allocationPercentage: 90,
+                startDate: new Date('2025-05-20T00:00:00Z'),
+                endDate: new Date('2025-11-15T23:59:59Z'),
+                role: 'Angular Developer'
+            },
+            // Assignments for Ajay Kumar
+            {
+                engineerId: ajay._id,
+                projectId: fintechProject._id, // Ajay is part-time, 50% max capacity
+                allocationPercentage: 50,
+                startDate: new Date('2025-05-20T00:00:00Z'),
+                endDate: new Date('2025-11-15T23:59:59Z'),
+                role: 'Mobile UI Dev'
+            },
+            // Assignments for Deepa Rao
+            {
+                engineerId: deepa._id,
+                projectId: aiChatbotProject._id,
+                allocationPercentage: 80,
+                startDate: new Date('2025-07-01T00:00:00Z'),
+                endDate: new Date('2026-01-31T23:59:59Z'),
+                role: 'ML Engineer'
             }
         ];
 
-        // Insert assignments into the database
         await Assignment.insertMany(assignmentsData);
         console.log('Assignments seeded.');
 
@@ -254,11 +366,9 @@ const seedDatabase = async () => {
     } catch (error) {
         console.error('Error seeding database:', error);
     } finally {
-        // Disconnect from MongoDB
         await mongoose.disconnect();
         console.log('MongoDB disconnected.');
     }
 };
 
-// Execute the seeding function
 seedDatabase();

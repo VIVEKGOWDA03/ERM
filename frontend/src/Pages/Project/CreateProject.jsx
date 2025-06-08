@@ -28,12 +28,12 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-import {
-
-  fetchAllUsers,
-} from "../../store/Slice/index"; // Import createProject action
+import { fetchAllUsers } from "../../store/Slice/index"; // Import createProject action
 import { fetchAllEngineers } from "../../store/Slice/index"; // Needed to get managers for managerId field
-import { createProject, fetchAllProjects } from "../../store/Slice/ProjectsSlice";
+import {
+  createProject,
+  fetchAllProjects,
+} from "../../store/Slice/ProjectsSlice";
 
 // --- Zod Schema for form validation ---
 const formSchema = z.object({
@@ -55,12 +55,11 @@ const formSchema = z.object({
     .nonempty({ message: "Please select a project manager." }),
 });
 
-
 const CreateProjectForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user: currentUser } = useSelector((state) => state.auth);
-  const { users ,engineers, isLoading, error } = useSelector(
+  const { users, engineers, isLoading, error } = useSelector(
     (state) => state.data
   );
 
@@ -159,18 +158,7 @@ const CreateProjectForm = () => {
 
   if (isLoading && engineers.length === 0) {
     // Only show full loading if initial data is missing
-    return (
-      <Box
-        sx={{
-          p: 4,
-          textAlign: "center",
-          fontSize: "1.25rem",
-          fontWeight: "bold",
-        }}
-      >
-        Loading managers data...
-      </Box>
-    );
+    return <DashboardShimmer />;
   }
   if (error) {
     return (
@@ -423,7 +411,7 @@ const CreateProjectForm = () => {
                         managers.map((manager) => (
                           <MenuItem key={manager._id} value={manager._id}>
                             {manager.name}
-                             {/* ({manager.email}) */}
+                            {/* ({manager.email}) */}
                           </MenuItem>
                         ))
                       ) : (

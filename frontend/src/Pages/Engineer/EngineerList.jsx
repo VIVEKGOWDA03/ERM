@@ -18,24 +18,20 @@ import {
   Chip,
   Button
 } from '@mui/material';
-
-// Lucide React Icons
 import { Eye, PlusCircle } from 'lucide-react';
 
-// Import fetchAllEngineers from the data slice
 import { fetchAllEngineers } from '../../store/Slice/index'; 
+import DashboardShimmer from '../../Compontes/DashboardShimmer';
 
 const EngineerList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // CORRECTED: Select engineers, isLoading, error from state.data
   const { engineers, isLoading, error } = useSelector((state) => state.data);
   const { user: currentUser } = useSelector((state) => state.auth);
 
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    // Only managers can view the full engineer list
     if (!currentUser || currentUser.role !== 'manager') {
       toast.error("Access Denied. Only managers can view the engineer list.");
       navigate('/manager-dashboard', { replace: true });
@@ -55,15 +51,15 @@ const EngineerList = () => {
   });
 
   const handleViewProfile = (engineerId) => {
-    navigate(`/engineers/${engineerId}`); // Navigate to the EngineerProfile page
+    navigate(`/engineers/${engineerId}`);
   };
 
   const handleCreateNewEngineer = () => {
-    navigate('/auth/register'); // Assuming register form is used for new engineer creation
+    navigate('/auth/register'); 
   };
 
   if (isLoading) {
-    return <Box sx={{ p: 4, textAlign: 'center', fontSize: '1.25rem', fontWeight: 'bold' }}>Loading engineers...</Box>;
+    return <DashboardShimmer/>;
   }
 
   if (error) {

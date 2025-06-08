@@ -28,6 +28,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { fetchAllEngineers } from "../../store/Slice";
 import { fetchAllAssignments } from "../../store/Slice/AssignmentSlice";
+import DashboardShimmer from "../../Compontes/DashboardShimmer";
 
 // --- Zod Schema for form validation ---
 const formSchema = z.object({
@@ -172,11 +173,7 @@ const CreateAssignmentForm = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="p-8 text-center text-xl font-semibold">
-        Loading data for form...
-      </div>
-    );
+    return <DashboardShimmer />;
   }
   if (error) {
     return (
@@ -188,7 +185,7 @@ const CreateAssignmentForm = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box className="container mx-auto p-6 md:p-10">
+      <Box className="container max-w-full mx-auto p-6 md:p-10">
         <Card
           sx={{
             maxWidth: "600px",
@@ -202,25 +199,27 @@ const CreateAssignmentForm = () => {
               <Typography
                 variant="h4"
                 component="div"
-                sx={{ fontWeight: "bold", color: "text.primary" }}
+                sx={{
+                  fontWeight: "bold",
+                  color: "text.primary",
+                  fontSize: { xs: "1.25rem", sm: "1.5rem", md: "2rem" }, // Responsive
+                }}
               >
                 Assign Engineer to Project
               </Typography>
             }
             subheader={
-              <Typography variant="body1" sx={{ color: "text.secondary" }}>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "text.secondary",
+                  fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" }, // Responsive
+                }}
+              >
                 Allocate an engineer to a specific project with a defined
                 capacity.
               </Typography>
             }
-            sx={{
-              bgcolor: "background.paper",
-              borderBottom: "1px solid",
-              borderColor: "grey.300",
-              borderTopLeftRadius: 8,
-              borderTopRightRadius: 8,
-              padding: 3,
-            }}
           />
           <CardContent sx={{ padding: 3 }}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -254,9 +253,17 @@ const CreateAssignmentForm = () => {
                     {fieldError && (
                       <FormHelperText>{fieldError.message}</FormHelperText>
                     )}
-                    <Typography variant="caption" color="text.secondary">
-                      Choose the engineer for this assignment.
-                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{
+                        fontSize: {
+                          xs: "0.65rem",
+                          sm: "0.75rem",
+                          md: "0.875rem",
+                        },
+                      }}
+                    ></Typography>
                   </FormControl>
                 )}
               />
@@ -272,7 +279,13 @@ const CreateAssignmentForm = () => {
                     borderRadius: 1,
                   }}
                 >
-                  <Typography variant="body2" sx={{ color: "text.primary" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.primary",
+                      fontSize: { xs: "0.75rem", sm: "0.85rem", md: "1rem" },
+                    }}
+                  >
                     <Typography component="span" sx={{ fontWeight: "bold" }}>
                       {selectedEngineer.name}'s
                     </Typography>{" "}
@@ -281,7 +294,13 @@ const CreateAssignmentForm = () => {
                       {currentEngineerAllocation.toFixed(0)}%
                     </Typography>
                   </Typography>
-                  <Typography variant="body2" sx={{ color: "text.primary" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.primary",
+                      fontSize: { xs: "0.75rem", sm: "0.85rem", md: "1rem" },
+                    }}
+                  >
                     Available Capacity Before This Assignment:{" "}
                     <Typography component="span" sx={{ fontWeight: "bold" }}>
                       {engineerAvailableCapacity.toFixed(0)}%
@@ -345,9 +364,17 @@ const CreateAssignmentForm = () => {
                     {fieldError && (
                       <FormHelperText>{fieldError.message}</FormHelperText>
                     )}
-                    <Typography variant="caption" color="text.secondary">
-                      Choose the project for this assignment.
-                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{
+                        fontSize: {
+                          xs: "0.65rem",
+                          sm: "0.75rem",
+                          md: "0.875rem",
+                        },
+                      }}
+                    ></Typography>
                   </FormControl>
                 )}
               />
@@ -365,11 +392,7 @@ const CreateAssignmentForm = () => {
                     {...field}
                     onChange={(e) => field.onChange(parseFloat(e.target.value))}
                     error={!!fieldError}
-                    helperText={
-                      fieldError
-                        ? fieldError.message
-                        : "Percentage of engineer's capacity allocated to this project (0-100)."
-                    }
+                    helperText={fieldError ? fieldError.message : ""}
                   />
                 )}
               />
@@ -385,11 +408,7 @@ const CreateAssignmentForm = () => {
                     placeholder="e.g., Lead Frontend Developer"
                     {...field}
                     error={!!fieldError}
-                    helperText={
-                      fieldError
-                        ? fieldError.message
-                        : "The specific role of the engineer on this project."
-                    }
+                    helperText={fieldError ? fieldError.message : ""}
                   />
                 )}
               />

@@ -1,73 +1,87 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation, useMatches } from "react-router-dom"; // Import useMatches for route data
+import { useLocation, useMatches } from "react-router-dom";
 
 const Header = () => {
-  const { user } = useSelector((state) => state.auth); // Get user data from Redux
+  const { user } = useSelector((state) => state.auth);
   const displayName = user?.name || "Guest User";
   const avatarInitial = displayName.charAt(0).toUpperCase();
 
-  const location = useLocation(); // To get current path
-  const matches = useMatches(); // To get route data including path
+  const location = useLocation();
+  const matches = useMatches();
 
-  // State to hold the dynamic page title
   const [pageTitle, setPageTitle] = useState("Dashboard");
 
   useEffect(() => {
-    // This effect runs when the route changes
-    const currentMatch = matches.find(match => match.pathname === location.pathname);
+    const currentMatch = matches.find(
+      (match) => match.pathname === location.pathname
+    );
 
-    // Define a mapping for pathnames to display titles
     const titleMap = {
       "/manager-dashboard": "Manager Dashboard",
       "/engineer-dashboard": "Engineer Dashboard",
-      [`/engineers/${user?._id}`]: "My Profile", // Dynamic profile title
-      "/engineers": "All Engineers", // Assuming you add this route for managers
+      [`/engineers/${user?._id}`]: "My Profile",
+      "/engineers": "All Engineers",
       "/projects": "Projects Overview",
       "/assignments": "My Assignments",
       "/auth/login": "Login",
       "/auth/register": "Register",
       "/unauth-page": "Unauthorized",
-      // Add more mappings as needed
     };
 
-    // Try to find a specific title for the current path
     let newTitle = titleMap[location.pathname];
 
-    // Handle dynamic parts like /engineers/:id
-    if (!newTitle && location.pathname.startsWith("/engineers/") && location.pathname !== `/engineers/${user?._id}`) {
-        newTitle = "Engineer Profile"; // Default title for other engineer profiles
+    if (
+      !newTitle &&
+      location.pathname.startsWith("/engineers/") &&
+      location.pathname !== `/engineers/${user?._id}`
+    ) {
+      newTitle = "Engineer Profile";
     }
 
-    // Fallback to a default if no specific title is found
     if (!newTitle) {
-      // Basic fallback: capitalize first segment or use a generic title
-      const pathSegments = location.pathname.split('/').filter(segment => segment);
-      newTitle = pathSegments.length > 0 ? pathSegments[0].replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : "Home";
+      const pathSegments = location.pathname
+        .split("/")
+        .filter((segment) => segment);
+      newTitle =
+        pathSegments.length > 0
+          ? pathSegments[0]
+              .replace(/-/g, " ")
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")
+          : "Home";
     }
 
     setPageTitle(newTitle);
-  }, [location.pathname, matches, user]); // Re-run when path or user changes
+  }, [location.pathname, matches, user]);
 
   return (
-    <header className="flex items-center justify-between px-6 py-3 bg-gray-700 text-white shadow-md z-10 sticky top-0">
-      {/* Dynamic Page Title */}
-      <h1 className="text-2xl font-semibold text-gray-100">{pageTitle}</h1>
+    <header className="flex font-roboto items-center justify-between px-4 sm:px-6 py-3 bg-gradient-to-br from-gray-800 to-gray-900 text-white shadow-md sticky top-0 z-20">
+      {/* Page Title */}
+      <h1 className="text-xl sm:text-2xl font-semibold text-gray-100 truncate">
+        {pageTitle}
+      </h1>
 
-      {/* User Mini-Profile */}
+      {/* Right Section */}
       <div className="flex items-center space-x-3">
-        <span className="text-lg font-medium text-gray-200 hidden sm:block">
-          Welcome, {displayName.split(" ")[0]}!
-        </span> {/* Hidden on small screens to save space */}
+        {/* Welcome Text */}
+        <span className="hidden sm:inline-block text-sm sm:text-base font-medium text-gray-200">
+          Welcome, {displayName?.split(" ")[0]}!
+        </span>
 
-        {/* Avatar (same logic as sidebar) */}
-        <div className="relative w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-xl font-bold text-white shadow-sm overflow-hidden">
-          {user?.avatar ? (
-            <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
-          ) : (
-            <span>{avatarInitial}</span>
-          )}
-        </div>
+        {/* Avatar */}
+        {/* <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-600 flex items-center justify-center text-lg sm:text-xl font-bold text-white shadow-inner overflow-hidden ring-2 ring-blue-400">
+      {user?.avatar ? (
+        <img
+          src={user.avatar}
+          alt="avatar"
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <span>{avatarInitial}</span>
+      )}
+    </div> */}
       </div>
     </header>
   );

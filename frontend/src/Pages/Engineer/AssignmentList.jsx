@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import * as XLSX from "xlsx"; // Import xlsx library
+import { saveAs } from "file-saver"; // Import file-saver
 
-// Material-UI Imports
+// MUI Components
 import {
   Table,
   TableBody,
@@ -19,23 +21,25 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Button,
+  Card,
   Chip,
+  Skeleton,
+  Pagination,
+  Button, // Import Button for the download feature
 } from "@mui/material";
 
-// Lucide React Icons (assuming you have these or similar icons)
-import { Eye, Edit, Trash2 } from "lucide-react"; // Placeholder for future actions if needed
+// Icons
+import { Download as DownloadIcon } from "@mui/icons-material"; // Import a download icon
 
-// Import thunks from their respective slices
+// Redux Thunks
 import { fetchAllAssignments } from "../../store/Slice/AssignmentSlice";
 import { fetchAllProjects } from "../../store/Slice/ProjectsSlice";
-import { fetchAllUsers } from "../../store/Slice/index"; // fetchAllUsers for all users, fetchAllEngineers for detailed engineer profiles if needed
+import { fetchAllUsers } from "../../store/Slice/index";
 
 const AssignmentListPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Select data from the correct Redux slices
   const {
     assignments,
     isLoading: assignmentsLoading,
@@ -46,7 +50,6 @@ const AssignmentListPage = () => {
     isLoading: projectsLoading,
     error: projectsError,
   } = useSelector((state) => state.projects);
-  // We still need 'users' for the filter dropdowns to show engineer names
   const {
     users,
     isLoading: dataLoading,
@@ -57,35 +60,27 @@ const AssignmentListPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterProject, setFilterProject] = useState("all");
   const [filterEngineer, setFilterEngineer] = useState("all");
-  const [filterStatus, setFilterStatus] = useState("all"); // Filter by project status
+  const [filterStatus, setFilterStatus] = useState("all");
+
+  // Pagination states (if you implement full pagination later)
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 10; // You can adjust this
 
   useEffect(() => {
-    // Only managers can view this list
     if (!currentUser || currentUser.role !== "manager") {
       toast.error("Access Denied. Only managers can view all assignments.");
       navigate("/manager-dashboard", { replace: true });
       return;
     }
 
-    // Fetch all necessary data
     dispatch(fetchAllAssignments());
     dispatch(fetchAllProjects());
-    dispatch(fetchAllUsers()); // Get all users for mapping engineer names in filters
+    dispatch(fetchAllUsers());
   }, [dispatch, currentUser, navigate]);
 
-  // Create map for engineer names for dropdowns
-  const engineerMapForFilters = users.reduce((acc, user) => {
-    if (user.role === "engineer") {
-      acc[user._id] = user.name;
-    }
-    return acc;
-  }, {});
-
-  // Filtered assignments based on search term, project, and engineer
   const filteredAssignments = assignments.filter((assignment) => {
-    // Direct access to populated names for search filtering
     const projectName = assignment.projectId?.name || "";
-    const engineerName = assignment.engineerId?.name || ""; // Corrected to use populated name
+    const engineerName = assignment.engineerId?.name || "";
     const projectStatus = assignment.projectId?.status || "";
 
     const matchesSearch =
@@ -94,7 +89,6 @@ const AssignmentListPage = () => {
       engineerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       assignment.role.toLowerCase().includes(searchTerm.toLowerCase());
 
-    // Corrected filter logic to compare IDs
     const matchesProject =
       filterProject === "all" ||
       (assignment.projectId && assignment.projectId._id === filterProject);
@@ -107,207 +101,247 @@ const AssignmentListPage = () => {
     return matchesSearch && matchesProject && matchesEngineer && matchesStatus;
   });
 
-  // Combine loading and error states
+  // Calculate pagination data (for the current displayed page)
+  const startIndex = (page - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const paginatedAssignments = filteredAssignments.slice(startIndex, endIndex);
+  const pageCount = Math.ceil(filteredAssignments.length / rowsPerPage);
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
   const isLoading = assignmentsLoading || projectsLoading || dataLoading;
   const error = assignmentsError || projectsError || dataError;
 
+  const statusColorMap = {
+    planning: "warning",
+    active: "info",
+    completed: "success",
+  };
+
+  const getStatusBadgeColor = (status) =>
+    statusColorMap[status] || "default";
+
+  // --- NEW: Function to handle Excel export ---
+  const handleDownloadReport = () => {
+    if (filteredAssignments.length === 0) {
+      toast("No data to export.", { icon: 'ℹ️' });
+      return;
+    }
+
+    // Prepare data for export
+    const dataToExport = filteredAssignments.map((assignment) => ({
+      'Project Name': assignment.projectId?.name || 'N/A',
+      'Engineer Name': assignment.engineerId?.name || 'N/A',
+      'Role': assignment.role,
+      'Allocation (%)': assignment.allocationPercentage,
+      'Start Date': new Date(assignment.startDate).toLocaleDateString(),
+      'End Date': new Date(assignment.endDate).toLocaleDateString(),
+      'Project Status': assignment.projectId?.status?.charAt(0)?.toUpperCase() + assignment.projectId?.status?.slice(1) || 'N/A',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Assignments Report");
+
+    // Generate buffer
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+    });
+
+    saveAs(data, `Assignments_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+    toast.success("Assignment report downloaded!");
+  };
+
   if (isLoading) {
     return (
-      <Box
-        sx={{
-          p: 4,
-          textAlign: "center",
-          fontSize: "1.25rem",
-          fontWeight: "bold",
-        }}
-      >
-        Loading assignments...
+      <Box sx={{ p: 4, bgcolor: "background.default", minHeight: "100vh" }}>
+        <Skeleton variant="text" width={250} height={50} sx={{ mb: 4 }} />
+        <Box sx={{ display: "flex", gap: 2, mb: 4, flexWrap: "wrap" }}>
+          <Skeleton variant="rectangular" width={300} height={56} />
+          <Skeleton variant="rectangular" width={180} height={56} />
+          <Skeleton variant="rectangular" width={180} height={56} />
+          <Skeleton variant="rectangular" width={180} height={56} />
+        </Box>
+        <Skeleton variant="text" width={150} height={30} sx={{ mb: 2 }} />
+        <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 2 }} />
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box sx={{ p: 4, color: "error.main", textAlign: "center" }}>
-        Error loading data: {error}
+      <Box sx={{ p: 4, textAlign: "center", color: "error.main", bgcolor: "background.default", minHeight: "100vh" }}>
+        <Typography variant="h6">Error loading data:</Typography>
+        <Typography variant="body1">{error}</Typography>
+        <Typography variant="body2" sx={{ mt: 2 }}>Please try again later.</Typography>
       </Box>
     );
   }
 
-  // Helper for status badge color
-  const getStatusBadgeColor = (status) => {
-    switch (status) {
-      case "active":
-        return "info";
-      case "planning":
-        return "warning";
-      case "completed":
-        return "success";
-      default:
-        return "default";
-    }
-  };
-
   return (
-    <Box
-      sx={{
-        p: { xs: 3, md: 6 },
-        bgcolor: "background.default",
-        minHeight: "100vh",
-      }}
-    >
-      <Typography
-        variant="h4"
-        component="h1"
-        gutterBottom
-        sx={{ fontWeight: "bold", mb: 4, color: "text.primary" }}
-      >
-        All Assignments
+    <Box sx={{ p: { xs: 3, md: 6 }, bgcolor: "background.default", minHeight: "100vh" }}>
+      <Typography variant="h4" sx={{ fontWeight: 700, color: "primary.main", mb: 4, fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem' } }}>
+        📋 All Assignments
       </Typography>
 
-      {/* Filter and Search Section */}
-      <Box
-        sx={{
-          mb: 4,
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 2,
-          alignItems: "center",
-        }}
-      >
-        <TextField
-          label="Search Assignments"
-          variant="outlined"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{ flexGrow: 1, minWidth: { xs: "100%", md: "300px" } }}
-        />
-        <FormControl
-          variant="outlined"
-          sx={{ minWidth: { xs: "100%", md: "180px" } }}
+      {/* Filters and Download Button */}
+      <Card sx={{ mb: 4, p: { xs: 2, sm: 3 }, borderRadius: 2, boxShadow: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: { xs: 2, md: 3 }, 
+            flexWrap: "wrap",
+            alignItems: "center", 
+          }}
         >
-          <InputLabel>Filter by Project</InputLabel>
-          <Select
-            value={filterProject}
-            onChange={(e) => setFilterProject(e.target.value)}
-            label="Filter by Project"
-          >
-            <MenuItem value="all">All Projects</MenuItem>
-            {projects.map((project) => (
-              <MenuItem key={project._id} value={project._id}>
-                {project.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl
-          variant="outlined"
-          sx={{ minWidth: { xs: "100%", md: "180px" } }}
-        >
-          <InputLabel>Filter by Engineer</InputLabel>
-          <Select
-            value={filterEngineer}
-            onChange={(e) => setFilterEngineer(e.target.value)}
-            label="Filter by Engineer"
-          >
-            <MenuItem value="all">All Engineers</MenuItem>
-            {/* Using users array directly for filter dropdown, mapping by name for display */}
-            {users
-              .filter((u) => u.role === "engineer")
-              .map((engineer) => (
-                <MenuItem key={engineer._id} value={engineer._id}>
-                  {engineer.name}
+          <TextField
+            label="Search Assignments"
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ flexGrow: 1, minWidth: { xs: '100%', sm: 200 } }} 
+            size="small" // Make text field smaller
+          />
+          <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }} size="small"> {/* Full width on xs, then minWidth */}
+            <InputLabel>Filter by Project</InputLabel>
+            <Select
+              value={filterProject}
+              onChange={(e) => setFilterProject(e.target.value)}
+              label="Filter by Project"
+            >
+              <MenuItem value="all">All Projects</MenuItem>
+              {projects.map((project) => (
+                <MenuItem key={project._id} value={project._id}>
+                  {project.name}
                 </MenuItem>
               ))}
-          </Select>
-        </FormControl>
-        <FormControl
-          variant="outlined"
-          sx={{ minWidth: { xs: "100%", md: "180px" } }}
-        >
-          <InputLabel>Filter by Project Status</InputLabel>
-          <Select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            label="Filter by Project Status"
+            </Select>
+          </FormControl>
+          <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }} size="small">
+            <InputLabel>Filter by Engineer</InputLabel>
+            <Select
+              value={filterEngineer}
+              onChange={(e) => setFilterEngineer(e.target.value)}
+              label="Filter by Engineer"
+            >
+              <MenuItem value="all">All Engineers</MenuItem>
+              {users
+                .filter((u) => u.role === "engineer")
+                .map((engineer) => (
+                  <MenuItem key={engineer._id} value={engineer._id}>
+                    {engineer.name}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+          <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }} size="small">
+            <InputLabel>Filter by Status</InputLabel>
+            <Select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              label="Filter by Status"
+            >
+              <MenuItem value="all">All Statuses</MenuItem>
+              <MenuItem value="planning">Planning</MenuItem>
+              <MenuItem value="active">Active</MenuItem>
+              <MenuItem value="completed">Completed</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<DownloadIcon />}
+            onClick={handleDownloadReport}
+            sx={{
+              minWidth: { xs: '100%', sm: 'auto' }, // Full width on xs, auto on sm+
+              py: { xs: 1.2, sm: 1.5 }, // Responsive vertical padding
+              px: { xs: 2, sm: 3 }, // Responsive horizontal padding
+              fontSize: { xs: '0.875rem', sm: '1rem' } // Responsive font size
+            }}
           >
-            <MenuItem value="all">All Statuses</MenuItem>
-            <MenuItem value="planning">Planning</MenuItem>
-            <MenuItem value="active">Active</MenuItem>
-            <MenuItem value="completed">Completed</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+            Download Report
+          </Button>
+        </Box>
+      </Card>
 
-      {/* Assignments Table */}
-      <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 2 }}>
-        <Table sx={{ minWidth: 800 }} aria-label="all assignments table">
+      {/* Assignment Count */}
+      <Typography variant="subtitle1" sx={{ mb: 2, color: "text.secondary" }}>
+        Showing {filteredAssignments.length} assignments
+      </Typography>
+
+      {/* Table */}
+      <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3, overflowX: 'auto' }}> 
+        <Table sx={{ minWidth: 1000 }} aria-label="assignments table">
           <TableHead sx={{ bgcolor: "grey.100" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Project</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Engineer</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Role</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Allocation (%)</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Start Date</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>End Date</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Project Status</TableCell>
-              {/* <TableCell sx={{ fontWeight: 'bold', textAlign: 'center' }}>Actions</TableCell> {/* Placeholder for edit/delete */}
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Project</TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Engineer</TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Role</TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Allocation (%)</TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Start Date</TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>End Date</TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredAssignments.length > 0 ? (
-              filteredAssignments.map((assignment) => (
+            {paginatedAssignments.length > 0 ? ( // Use paginatedAssignments here
+              paginatedAssignments.map((assignment) => (
                 <TableRow
                   key={assignment._id}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  sx={{ "&:hover": { backgroundColor: "action.hover" } }}
                 >
-                  <TableCell component="th" scope="row">
-                    {/* CORRECTED: Directly access populated project name */}
-                    {assignment.projectId?.name || "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    {/* CORRECTED: Directly access populated engineer name */}
-                    {assignment.engineerId?.name || "N/A"}
-                  </TableCell>
-                  <TableCell>{assignment.role}</TableCell>
-                  <TableCell>{assignment.allocationPercentage}%</TableCell>
-                  <TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{assignment.projectId?.name || "N/A"}</TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{assignment.engineerId?.name || "N/A"}</TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{assignment.role}</TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{assignment.allocationPercentage}%</TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>
                     {new Date(assignment.startDate).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>
                     {new Date(assignment.endDate).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>
                     <Chip
                       label={
                         assignment.projectId?.status?.charAt(0)?.toUpperCase() +
-                          assignment.projectId?.status?.slice(1) || "N/A"
+                        assignment.projectId?.status?.slice(1) || "N/A"
                       }
                       size="small"
                       color={getStatusBadgeColor(assignment.projectId?.status)}
+                      sx={{ minWidth: 70 }} 
                     />
                   </TableCell>
-                  {/*
-                  <TableCell sx={{ textAlign: 'center' }}>
-                    <Button variant="outlined" size="small" startIcon={<Edit size={16} />} sx={{ mr: 1 }}>Edit</Button>
-                    <Button variant="outlined" size="small" color="error" startIcon={<Trash2 size={16} />}>Delete</Button>
-                  </TableCell>
-                  */}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={7}
-                  sx={{ textAlign: "center", py: 4, color: "text.secondary" }}
-                >
-                  No assignments found matching your criteria.
+                <TableCell colSpan={7} sx={{ textAlign: "center", py: 4 }}>
+                  <Typography variant="body1" color="text.secondary">
+                    🚫 No assignments found. Try changing the filters.
+                  </Typography>
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Pagination */}
+      {filteredAssignments.length > rowsPerPage && ( 
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          <Pagination
+            count={pageCount}
+            page={page}
+            onChange={handlePageChange}
+            color="primary"
+            size="large" 
+          />
+        </Box>
+      )}
     </Box>
   );
 };

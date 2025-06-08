@@ -47,7 +47,6 @@ const RoutesWithAuth = () => {
   }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
-    // Make sure user is fetched if not available
     if (!user) {
       dispatch(fetchUser());
     }
