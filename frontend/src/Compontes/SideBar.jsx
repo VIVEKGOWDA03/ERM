@@ -33,12 +33,14 @@ export default function SideBar() {
     sessionStorage.clear(); // Clear session storage completely on logout
     navigate("/auth/login");
   };
+  console.log(user.role,user.id);
+  
 
   // Function to handle profile navigation based on user role
   const handleProfileNavigation = () => {
-    if (user && user._id) {
+    if (user && user.id) {
       if (user.role === 'manager') {
-        navigate(`/manager-profile`); // Navigate to a new ManagerProfile route
+        navigate(`/manager-profile`); 
       } else if (user.role === 'engineer') {
         navigate(`/engineers/${user.id}`); // Navigate to existing EngineerProfile
       }

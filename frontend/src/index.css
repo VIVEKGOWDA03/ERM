@@ -1,4 +1,7 @@
 /* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,7 +18,6 @@
   /* src/index.css or src/tailwind.css */
 
 /* Import Google Fonts (place at the very top) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 
 

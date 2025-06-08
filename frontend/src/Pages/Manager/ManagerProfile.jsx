@@ -144,7 +144,7 @@ const ManagerProfile = () => {
             color="text.secondary"
             sx={{ fontStyle: "italic" }}
           >
-            More manager-specific details can be added here.
+            {/* More manager-specific details can be added here. */}
           </Typography>
         </CardContent>
       </Card>
