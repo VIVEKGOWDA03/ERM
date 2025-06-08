@@ -1,15 +1,10 @@
 {
-  "name": "chatty",
+  "name": "erm",
   "version": "1.0.0",
   "main": "index.js",
-"scripts": {
-  "build": "npm install && npm install --prefix frontend && npm install --prefix backend && npm run build --prefix frontend",
-  "start": "npm install --prefix backend && node backend/src/server.js"
-},
-
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "description": ""
+  "scripts": {
+    "build": "npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "npm install --prefix backend && node backend/server.js"
+  },
+  "license": "ISC"
 }
