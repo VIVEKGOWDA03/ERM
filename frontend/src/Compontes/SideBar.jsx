@@ -134,7 +134,8 @@ export default function SideBar() {
                   to="/assignments" // Assuming a route for all assignments for managers
                   className="flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200 ease-in-out group"
                 >
-                  <RiClipboardLine className="mr-3 text-xl group-hover:scale-110 transition-transform" />
+                <img  src="/assets/file.svg" alt="Assignments" className="w-6 h-6  text-white mr-3 text-xl group-hover:scale-110 transition-transform" />
+                  {/* <RiClipboardLine className="mr-3 text-xl group-hover:scale-110 transition-transform" /> */}
                   <span className="font-medium text-lg">All Assignments</span>
                 </Link>
               </li>

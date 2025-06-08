@@ -18,24 +18,13 @@ module.exports = {
   				max: '639px'
   			}
   		},
-  		fontFamily: {
-  			roboto: [
-  				'Roboto"',
-  				'sans-serif'
-  			],
-  			rubikVinyl: [
-  				'Rubik Vinyl"',
-  				'cursive'
-  			],
-  			cairoPlay: [
-  				'Cairo Play"',
-  				'sans-serif'
-  			],
-  			sixtyfour: [
-  				'Sixtyfour"',
-  				'cursive'
-  			]
-  		},
+fontFamily: {
+  roboto: ['Roboto', 'sans-serif'],
+  rubikVinyl: ['"Rubik Vinyl"', 'cursive'],
+  cairoPlay: ['"Cairo Play"', 'sans-serif'],
+  sixtyfour: ['"Sixtyfour"', 'cursive'],
+},
+
   		backdropBlur: {
   			xs: '2px',
   			huge: '50px'

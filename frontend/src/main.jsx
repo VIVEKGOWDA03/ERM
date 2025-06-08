@@ -30,6 +30,7 @@ import EngineerProfile from "./Pages/Engineer/EngineerProfile.jsx";
 import EngineerList from "./Pages/Engineer/EngineerList.jsx";
 import ManagerProfile from "./Pages/Manager/ManagerProfile.jsx";
 import AssignmentListPage from "./Pages/Engineer/AssignmentList.jsx";
+import LoaderTab from "./Ui/LoaderTab.jsx";
 
 const RoutesWithAuth = () => {
   const { isAuthenticated, user, isLoading } = useSelector(
@@ -55,7 +56,7 @@ const RoutesWithAuth = () => {
     return (
       <div className="flex items-center bg-black justify-center h-screen">
         {/* <Loader className="size-10 animate-spin"></Loader> */}
-        <Spinner />
+        <LoaderTab />
       </div>
     );
   const router = createBrowserRouter([

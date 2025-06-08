@@ -16,7 +16,10 @@ export function SpotlightPreview({
         className="w-full min-h-[200px]"
         src="/assets/logonovanex.jpeg"
       ></img> */}
-      <p className="text-6xl font-sans"> ERM</p>
+      <p className="text-4xl font-rubikVinyl  text-center">
+        {" "}
+        💻Engineering Resource <br/> Management System
+      </p>
     </div>
   );
 }
