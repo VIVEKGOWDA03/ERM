@@ -22,9 +22,8 @@ export const registerUser = createAsyncThunk(
       const response = await axios.post(`${baseUrl}/auth/register`, formData, {
         withCredentials: true,
       });
-      return response.data; // Return the response data (e.g., success message, user info)
+      return response.data;
     } catch (error) {
-      // Return a rejection with error data if available
       return rejectWithValue(error.response?.data || "Registration failed");
     }
   }
@@ -37,9 +36,7 @@ export const registerUserEmp = createAsyncThunk(
       const response = await axios.post(`${baseUrl}/auth/register`, formData, {
         withCredentials: true,
       });
-      return response.data; // Return the response data (e.g., success message, user info)
     } catch (error) {
-      // Return a rejection with error data if available
       return rejectWithValue(error.response?.data || "Registration failed");
     }
   }
