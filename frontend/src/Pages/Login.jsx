@@ -63,7 +63,7 @@ const Login = () => {
   };
 
   return (
-    <Box className="flex justify-center items-center   p-4">
+    <Box className="flex justify-center items-center bg-transparent  p-4">
       <Card sx={{ maxWidth: '450px', width: '100%', boxShadow: 6, borderRadius: 2 }}>
         <CardHeader
           title={<Typography variant="h4" component="div" sx={{ fontWeight: 'bold', color: 'text.primary', textAlign: 'center' }}>Log in to your account</Typography>}

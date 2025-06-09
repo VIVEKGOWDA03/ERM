@@ -92,7 +92,7 @@ const Register = () => {
   };
 
   return (
-    <div className="mx-auto p-[4%] bg-white shadow-lg rounded-lg z-20 border border-white/20 backdrop-blur-sm w-full max-w-md space-y-4">
+    <div className="mx-auto p-[4%] bg-transparent shadow-lg bg-white rounded-lg z-20 border border-white/20 backdrop-blur-sm w-full max-w-md space-y-4">
       <div className="text-center">
         <h1 className="text-3xl font-bold tracking-tighter text-gray-800">
           Create new account
@@ -171,8 +171,8 @@ const Register = () => {
           onChange={onChange}
           className="w-full border p-2 rounded"
         >
-          <option value={100}>Full-time (100%)</option>
-          <option value={50}>Part-time (50%)</option>
+          <option value={100}>Full-time </option>
+          <option value={50}>Part-time </option>
         </select>
 
         <input
