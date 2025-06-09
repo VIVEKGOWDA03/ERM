@@ -1,11 +1,7 @@
 import React from "react";
-// Assuming CustomBadge, CustomCard from Config/Custom.js
 import { CustomBadge, CustomCard } from "../../Config/Custom";
 
-// ProjectsOverview component now receives projects as a prop
-const ProjectsOverview = ({ projects }) => { // Removed 'users' prop as it's not strictly needed for manager name
-                                             // if managerId is already populated in project object
-  // Helper function to get status badge styling
+const ProjectsOverview = ({ projects }) => {
   const getStatusBadgeStyle = (status) => {
     switch (status) {
       case "active":
@@ -15,7 +11,7 @@ const ProjectsOverview = ({ projects }) => { // Removed 'users' prop as it's not
       case "completed":
         return "bg-green-100 text-green-800";
       default:
-        return "bg-gray-100 text-gray-800"; // Fallback
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -84,7 +80,6 @@ const ProjectsOverview = ({ projects }) => { // Removed 'users' prop as it's not
                         project.status.slice(1)}
                     </CustomBadge>
                   </td>
-                  {/* Access manager name directly as it's populated by the backend */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                     {project.managerId ? project.managerId.name : "N/A"}
                   </td>
@@ -107,10 +102,7 @@ const ProjectsOverview = ({ projects }) => { // Removed 'users' prop as it's not
               ))
             ) : (
               <tr>
-                <td
-                  colSpan="6"
-                  className="px-6 py-4 text-center text-gray-500"
-                >
+                <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
                   No projects found.
                 </td>
               </tr>

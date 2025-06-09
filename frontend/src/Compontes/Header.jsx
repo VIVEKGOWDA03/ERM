@@ -63,9 +63,7 @@ const Header = () => {
         {pageTitle}
       </h1>
 
-      {/* Right Section */}
       <div className="flex items-center space-x-3">
-        {/* Welcome Text */}
         <span className="hidden sm:inline-block text-sm sm:text-base font-medium text-gray-200">
           Welcome, {displayName?.split(" ")[0]}!
         </span>

@@ -6,7 +6,6 @@ import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-// Material-UI Imports
 import {
   TextField,
   Button,
@@ -20,22 +19,20 @@ import {
   MenuItem,
   Box,
   FormHelperText,
-  Chip, // For displaying skills as chips
+  Chip, 
 } from "@mui/material";
 
-// Material-UI Date Picker Imports
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-import { fetchAllUsers } from "../../store/Slice/index"; // Import createProject action
-import { fetchAllEngineers } from "../../store/Slice/index"; // Needed to get managers for managerId field
+import { fetchAllUsers } from "../../store/Slice/index"; 
+import { fetchAllEngineers } from "../../store/Slice/index"; 
 import {
   createProject,
   fetchAllProjects,
 } from "../../store/Slice/ProjectsSlice";
 
-// --- Zod Schema for form validation ---
 const formSchema = z.object({
   name: z.string().nonempty({ message: "Project name is required." }),
   description: z.string().nonempty({ message: "Description is required." }),
@@ -82,14 +79,12 @@ const CreateProjectForm = () => {
   const managers = users.filter((eng) => eng.role === "manager");
 
   useEffect(() => {
-    // Only managers can create/edit projects
     if (!currentUser || currentUser.role !== "manager") {
       toast.error("Access Denied. Only managers can create projects.");
       navigate("/manager-dashboard", { replace: true });
       return;
     }
     if (managers.length === 0) {
-      // Only fetch if managers list is empty
       dispatch(fetchAllEngineers());
     }
   }, [dispatch, currentUser, navigate, managers.length]);
@@ -97,7 +92,6 @@ const CreateProjectForm = () => {
   useEffect(() => {
     dispatch(fetchAllUsers());
   }, [dispatch]);
-  // Handle skill input and chip display
   const [skillInput, setSkillInput] = useState("");
   const handleAddSkill = () => {
     const skillToAdd = skillInput.trim();
@@ -122,7 +116,6 @@ const CreateProjectForm = () => {
   };
 
   async function onSubmit(values) {
-    // Basic date validation
     if (
       values.startDate &&
       values.endDate &&
@@ -134,30 +127,26 @@ const CreateProjectForm = () => {
       return;
     }
 
-    // Ensure managerId is populated if the current user is manager, otherwise it's in the form
     const projectData = {
       ...values,
       startDate: values.startDate.toISOString(),
       endDate: values.endDate.toISOString(),
-      // Ensure managerId is the ID of the logged-in user if not explicitly selected
-      // (This assumes the form will pre-fill or implicitly set the current manager as project manager)
-      managerId: values.managerId || currentUser.id, // Fallback to current user's ID
+      managerId: values.managerId || currentUser.id, 
     };
 
     const result = await dispatch(createProject(projectData));
 
     if (result.meta.requestStatus === "fulfilled") {
       toast.success(result.payload.message || "Project created successfully!");
-      form.reset(); // Reset form fields
-      dispatch(fetchAllProjects()); // Refetch projects to update ProjectListPage
-      navigate("/projects"); // Navigate back to project list page
+      form.reset(); 
+      dispatch(fetchAllProjects());
+      navigate("/projects"); 
     } else {
       toast.error(result.payload || "Failed to create project.");
     }
   }
 
   if (isLoading && engineers.length === 0) {
-    // Only show full loading if initial data is missing
     return <DashboardShimmer />;
   }
   if (error) {
@@ -287,7 +276,6 @@ const CreateProjectForm = () => {
                 )}
               />
 
-              {/* Required Skills (Text Input + Chips) */}
               <Controller
                 name="requiredSkills"
                 control={form.control}
@@ -300,7 +288,7 @@ const CreateProjectForm = () => {
                       onChange={(e) => setSkillInput(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                          e.preventDefault(); // Prevent form submission
+                          e.preventDefault(); 
                           handleAddSkill();
                         }
                       }}
@@ -352,7 +340,7 @@ const CreateProjectForm = () => {
                     {...field}
                     onChange={(e) =>
                       field.onChange(parseInt(e.target.value) || 0)
-                    } // Ensure integer type
+                    }
                     error={!!fieldError}
                     helperText={
                       fieldError
@@ -376,7 +364,7 @@ const CreateProjectForm = () => {
                       labelId="project-status-label"
                       label="Project Status"
                       {...field}
-                      value={field.value || "planning"} // Ensure a default value is selected in MUI
+                      value={field.value || "planning"} 
                     >
                       <MenuItem value="planning">Planning</MenuItem>
                       <MenuItem value="active">Active</MenuItem>
@@ -405,7 +393,7 @@ const CreateProjectForm = () => {
                       labelId="manager-select-label"
                       label="Project Manager"
                       {...field}
-                      value={field.value || ""} // Ensure default value for Select
+                      value={field.value || ""} 
                     >
                       {managers.length > 0 ? (
                         managers.map((manager) => (

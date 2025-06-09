@@ -25,13 +25,11 @@ import {
   Chip,
   Skeleton,
   Pagination,
-  Button, // Import Button for the download feature
+  Button,
 } from "@mui/material";
 
-// Icons
-import { Download as DownloadIcon } from "@mui/icons-material"; // Import a download icon
+import { Download as DownloadIcon } from "@mui/icons-material"; 
 
-// Redux Thunks
 import { fetchAllAssignments } from "../../store/Slice/AssignmentSlice";
 import { fetchAllProjects } from "../../store/Slice/ProjectsSlice";
 import { fetchAllUsers } from "../../store/Slice/index";
@@ -62,9 +60,8 @@ const AssignmentListPage = () => {
   const [filterEngineer, setFilterEngineer] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
 
-  // Pagination states (if you implement full pagination later)
   const [page, setPage] = useState(1);
-  const rowsPerPage = 10; // You can adjust this
+  const rowsPerPage = 10; 
 
   useEffect(() => {
     if (!currentUser || currentUser.role !== "manager") {
@@ -101,7 +98,6 @@ const AssignmentListPage = () => {
     return matchesSearch && matchesProject && matchesEngineer && matchesStatus;
   });
 
-  // Calculate pagination data (for the current displayed page)
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const paginatedAssignments = filteredAssignments.slice(startIndex, endIndex);
@@ -123,14 +119,12 @@ const AssignmentListPage = () => {
   const getStatusBadgeColor = (status) =>
     statusColorMap[status] || "default";
 
-  // --- NEW: Function to handle Excel export ---
   const handleDownloadReport = () => {
     if (filteredAssignments.length === 0) {
       toast("No data to export.", { icon: 'ℹ️' });
       return;
     }
 
-    // Prepare data for export
     const dataToExport = filteredAssignments.map((assignment) => ({
       'Project Name': assignment.projectId?.name || 'N/A',
       'Engineer Name': assignment.engineerId?.name || 'N/A',
@@ -145,7 +139,6 @@ const AssignmentListPage = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Assignments Report");
 
-    // Generate buffer
     const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
     const data = new Blob([excelBuffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
@@ -204,9 +197,9 @@ const AssignmentListPage = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             sx={{ flexGrow: 1, minWidth: { xs: '100%', sm: 200 } }} 
-            size="small" // Make text field smaller
+            size="small" 
           />
-          <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }} size="small"> {/* Full width on xs, then minWidth */}
+          <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }} size="small"> 
             <InputLabel>Filter by Project</InputLabel>
             <Select
               value={filterProject}
@@ -257,10 +250,10 @@ const AssignmentListPage = () => {
             startIcon={<DownloadIcon />}
             onClick={handleDownloadReport}
             sx={{
-              minWidth: { xs: '100%', sm: 'auto' }, // Full width on xs, auto on sm+
-              py: { xs: 1.2, sm: 1.5 }, // Responsive vertical padding
-              px: { xs: 2, sm: 3 }, // Responsive horizontal padding
-              fontSize: { xs: '0.875rem', sm: '1rem' } // Responsive font size
+              minWidth: { xs: '100%', sm: 'auto' },
+              py: { xs: 1.2, sm: 1.5 }, 
+              px: { xs: 2, sm: 3 }, 
+              fontSize: { xs: '0.875rem', sm: '1rem' } 
             }}
           >
             Download Report
@@ -268,12 +261,10 @@ const AssignmentListPage = () => {
         </Box>
       </Card>
 
-      {/* Assignment Count */}
       <Typography variant="subtitle1" sx={{ mb: 2, color: "text.secondary" }}>
         Showing {filteredAssignments.length} assignments
       </Typography>
 
-      {/* Table */}
       <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3, overflowX: 'auto' }}> 
         <Table sx={{ minWidth: 1000 }} aria-label="assignments table">
           <TableHead sx={{ bgcolor: "grey.100" }}>
@@ -288,7 +279,7 @@ const AssignmentListPage = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedAssignments.length > 0 ? ( // Use paginatedAssignments here
+            {paginatedAssignments.length > 0 ? ( 
               paginatedAssignments.map((assignment) => (
                 <TableRow
                   key={assignment._id}
@@ -330,7 +321,6 @@ const AssignmentListPage = () => {
         </Table>
       </TableContainer>
 
-      {/* Pagination */}
       {filteredAssignments.length > rowsPerPage && ( 
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <Pagination

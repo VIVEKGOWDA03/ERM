@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-// Material-UI Imports
 import {
   Table,
   TableBody,
@@ -22,7 +21,6 @@ import {
   Button,
 } from "@mui/material";
 
-// Lucide React Icons
 import { Eye, Edit, Trash2 } from "lucide-react";
 
 import { fetchAllUsers } from "../../store/Slice/index";
@@ -32,7 +30,6 @@ import {
 } from "../../store/Slice/ProjectsSlice";
 import DashboardShimmer from "../../Compontes/DashboardShimmer";
 
-// Keep all imports unchanged
 
 const ProjectListPage = () => {
   const dispatch = useDispatch();

@@ -1,28 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useForm, Controller } from "react-hook-form"; // Import Controller for MUI integration
+import { useForm, Controller } from "react-hook-form"; 
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-// Material-UI Imports
 import {
   TextField,
   Button,
   Card,
   CardContent,
   CardHeader,
-  Typography, // For CardTitle/CardDescription
+  Typography, 
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Box, // For general layout containers
-  FormHelperText, // For form messages
+  Box, 
+  FormHelperText,
 } from "@mui/material";
 
-// Material-UI Date Picker Imports
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -30,7 +28,6 @@ import { fetchAllEngineers } from "../../store/Slice";
 import { fetchAllAssignments } from "../../store/Slice/AssignmentSlice";
 import DashboardShimmer from "../../Compontes/DashboardShimmer";
 
-// --- Zod Schema for form validation ---
 const formSchema = z.object({
   engineerId: z.string().nonempty({ message: "Please select an engineer." }),
   projectId: z.string().nonempty({ message: "Please select a project." }),
@@ -63,8 +60,8 @@ const CreateAssignmentForm = () => {
       engineerId: searchParams.get("engineerId") || "",
       projectId: "",
       allocationPercentage: 0,
-      startDate: null, // Use null for DatePicker default
-      endDate: null, // Use null for DatePicker default
+      startDate: null, 
+      endDate: null,
       role: "",
     },
   });
@@ -144,8 +141,6 @@ const CreateAssignmentForm = () => {
           capacityAfterProposed
         )}%.`
       );
-      // You might prevent submission here or allow with a warning
-      // return;
     }
 
     const assignmentData = {
@@ -165,7 +160,7 @@ const CreateAssignmentForm = () => {
       );
       form.reset();
       dispatch(fetchAllAssignments());
-      dispatch(fetchAllEngineers()); // Refetch engineers as their allocation might have changed
+      dispatch(fetchAllEngineers()); 
       navigate("/manager-dashboard");
     } else {
       toast.error(result.payload || "Failed to create assignment.");
@@ -202,7 +197,7 @@ const CreateAssignmentForm = () => {
                 sx={{
                   fontWeight: "bold",
                   color: "text.primary",
-                  fontSize: { xs: "1.25rem", sm: "1.5rem", md: "2rem" }, // Responsive
+                  fontSize: { xs: "1.25rem", sm: "1.5rem", md: "2rem" },
                 }}
               >
                 Assign Engineer to Project
@@ -213,7 +208,7 @@ const CreateAssignmentForm = () => {
                 variant="body1"
                 sx={{
                   color: "text.secondary",
-                  fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" }, // Responsive
+                  fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
                 }}
               >
                 Allocate an engineer to a specific project with a defined
@@ -268,7 +263,6 @@ const CreateAssignmentForm = () => {
                 )}
               />
 
-              {/* Engineer Capacity Feedback */}
               {selectedEngineer && (
                 <Box
                   sx={{
@@ -334,7 +328,6 @@ const CreateAssignmentForm = () => {
                 </Box>
               )}
 
-              {/* Project Select */}
               <Controller
                 name="projectId"
                 control={form.control}
@@ -379,7 +372,6 @@ const CreateAssignmentForm = () => {
                 )}
               />
 
-              {/* Allocation Percentage Input */}
               <Controller
                 name="allocationPercentage"
                 control={form.control}
@@ -397,7 +389,6 @@ const CreateAssignmentForm = () => {
                 )}
               />
 
-              {/* Role Input */}
               <Controller
                 name="role"
                 control={form.control}
@@ -413,7 +404,6 @@ const CreateAssignmentForm = () => {
                 )}
               />
 
-              {/* Start Date Picker */}
               <Controller
                 name="startDate"
                 control={form.control}
@@ -433,7 +423,6 @@ const CreateAssignmentForm = () => {
                 )}
               />
 
-              {/* End Date Picker */}
               <Controller
                 name="endDate"
                 control={form.control}

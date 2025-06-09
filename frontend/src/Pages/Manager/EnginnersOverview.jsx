@@ -31,15 +31,14 @@ const EnginnersOverview = ({ engineers }) => {
       });
     }
 
-    // Calculate available capacity from maxCapacity and currentAllocatedPercentage (provided by backend)
     const engineerMaxCapacity = Number(engineer.maxCapacity) || 0;
     const allocated = engineer.currentAllocatedPercentage || 0;
     const availableCapacity = engineerMaxCapacity - allocated;
 
     return {
-      ...engineer, // Keep all properties from the backend
+      ...engineer,
       availableFromDate: availableFromDate,
-      availableCapacity: availableCapacity, // Frontend calculates this from backend provided data
+      availableCapacity: availableCapacity,
     };
   });
 

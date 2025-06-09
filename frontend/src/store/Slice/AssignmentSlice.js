@@ -6,13 +6,12 @@ const baseUrl = "https://erm-kok7.onrender.com/api";
 
 
 const initialState = {
-  assignments: [],       // Stores the list of all assignments
-  myAssignments: [],     // Stores assignments specific to the logged-in engineer
-  isLoading: false,      // Indicates if an async operation is in progress
-  error: null,           // Stores any error messages
+  assignments: [],       
+  myAssignments: [],     
+  isLoading: false,      
+  error: null,          
 };
 
-// Async Thunks for assignment-related operations
 
 // Fetch all assignments (typically for managers)
 export const fetchAllAssignments = createAsyncThunk(
@@ -67,7 +66,7 @@ export const createAssignment = createAsyncThunk(
       const response = await axios.post(`${baseUrl}/assignments`, assignmentData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data; // Backend should return success message or the new assignment
+      return response.data; 
     } catch (error) {
       console.error('Failed to create assignment:', error.response?.data || error.message);
       return rejectWithValue(error.response?.data?.message || 'Failed to create assignment');
@@ -75,7 +74,6 @@ export const createAssignment = createAsyncThunk(
   }
 );
 
-// You can add updateAssignment and deleteAssignment here later if needed for individual assignment management
 
 const assignmentSlice = createSlice({
   name: 'assignments',
@@ -83,7 +81,6 @@ const assignmentSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch All Assignments lifecycle
       .addCase(fetchAllAssignments.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -96,27 +93,24 @@ const assignmentSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Fetch My Assignments lifecycle
       .addCase(fetchMyAssignments.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(fetchMyAssignments.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.myAssignments = action.payload; // Store in myAssignments
+        state.myAssignments = action.payload; 
       })
       .addCase(fetchMyAssignments.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Create Assignment lifecycle
       .addCase(createAssignment.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(createAssignment.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Optionally add the new assignment to the state or refetch all assignments
         state.error = null;
       })
       .addCase(createAssignment.rejected, (state, action) => {

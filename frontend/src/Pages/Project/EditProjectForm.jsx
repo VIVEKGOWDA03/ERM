@@ -3,10 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useNavigate, useParams } from "react-router-dom"; // Import useParams
+import { useNavigate, useParams } from "react-router-dom"; 
 import toast from "react-hot-toast";
 
-// Material-UI Imports
 import {
   TextField,
   Button,
@@ -21,10 +20,9 @@ import {
   Box,
   FormHelperText,
   Chip,
-  CircularProgress, // Added for loading indicator
+  CircularProgress, 
 } from "@mui/material";
 
-// Material-UI Date Picker Imports
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -36,9 +34,7 @@ import {
 import { fetchAllUsers } from "../../store/Slice";
 import DashboardShimmer from "../../Compontes/DashboardShimmer";
 
-// Import necessary thunks
 
-// --- Zod Schema for form validation ---
 const formSchema = z.object({
   name: z.string().nonempty({ message: "Project name is required." }),
   description: z.string().nonempty({ message: "Description is required." }),
@@ -58,7 +54,6 @@ const formSchema = z.object({
     .nonempty({ message: "Please select a project manager." }),
 });
 
-// Example of all possible skills (could be fetched from backend or a config)
 const allPossibleSkills = [
   "React",
   "Node.js",
@@ -94,11 +89,10 @@ const allPossibleSkills = [
 ];
 
 const EditProjectForm = () => {
-  const { id: projectId } = useParams(); // Get project ID from URL parameters
+  const { id: projectId } = useParams(); 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user: currentUser } = useSelector((state) => state.auth);
-  // Using 'selectedProject' for the specific project being edited, and 'users' for managers dropdown
   const { users } = useSelector((state) => state.data);
   const { selectedProject, isLoading, error } = useSelector(
     (state) => state.projects
@@ -118,35 +112,28 @@ const EditProjectForm = () => {
     },
   });
 
-  // Get managers from the fetched users list
   const managers = users.filter((user) => user.role === "manager");
 
-  // --- Effect to fetch project data and populate form ---
   useEffect(() => {
-    // Only managers can create/edit projects
     if (!currentUser || currentUser.role !== "manager") {
       toast.error("Access Denied. Only managers can edit projects.");
       navigate("/manager-dashboard", { replace: true });
       return;
     }
 
-    // Fetch the specific project data when component mounts or projectId changes
     if (projectId) {
       dispatch(fetchProjectById(projectId));
     }
-    // Fetch all users (managers) for the dropdown
     if (users.length === 0) {
       dispatch(fetchAllUsers());
     }
   }, [dispatch, projectId, currentUser, navigate, users.length]);
 
-  // --- Effect to populate form with fetched project data ---
   useEffect(() => {
     if (selectedProject) {
       form.reset({
         name: selectedProject.name || "",
         description: selectedProject.description || "",
-        // Convert ISO strings back to Date objects for the DatePicker
         startDate: selectedProject.startDate
           ? new Date(selectedProject.startDate)
           : null,
@@ -156,14 +143,12 @@ const EditProjectForm = () => {
         requiredSkills: selectedProject.requiredSkills || [],
         teamSize: selectedProject.teamSize || 1,
         status: selectedProject.status || "planning",
-        // Ensure managerId is a string, even if populated object is received
         managerId:
           selectedProject.managerId?._id || selectedProject.managerId || "",
       });
     }
-  }, [selectedProject, form]); // Dependency on selectedProject and form.reset
+  }, [selectedProject, form]); 
 
-  // Handle skill input and chip display
   const [skillInput, setSkillInput] = useState("");
   const handleAddSkill = () => {
     const skillToAdd = skillInput.trim();
@@ -187,7 +172,6 @@ const EditProjectForm = () => {
     );
   };
 
-  // --- Form submission handler for updating project ---
   async function onSubmit(values) {
     if (
       values.startDate &&
@@ -206,7 +190,6 @@ const EditProjectForm = () => {
       endDate: values.endDate.toISOString(),
     };
 
-    // Dispatch the updateProject thunk
     const result = await dispatch(
       updateProject({ projectId, updatedData: updatedProjectData })
     );
@@ -359,7 +342,6 @@ const EditProjectForm = () => {
                 )}
               />
 
-              {/* Required Skills (Text Input + Chips) */}
               <Controller
                 name="requiredSkills"
                 control={form.control}
@@ -372,7 +354,7 @@ const EditProjectForm = () => {
                       onChange={(e) => setSkillInput(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                          e.preventDefault(); // Prevent form submission
+                          e.preventDefault(); 
                           handleAddSkill();
                         }
                       }}
@@ -424,7 +406,7 @@ const EditProjectForm = () => {
                     {...field}
                     onChange={(e) =>
                       field.onChange(parseInt(e.target.value) || 0)
-                    } // Ensure integer type
+                    } 
                     error={!!fieldError}
                     helperText={
                       fieldError
@@ -448,7 +430,7 @@ const EditProjectForm = () => {
                       labelId="project-status-label"
                       label="Project Status"
                       {...field}
-                      value={field.value || "planning"} // Ensure a default value is selected in MUI
+                      value={field.value || "planning"} 
                     >
                       <MenuItem value="planning">Planning</MenuItem>
                       <MenuItem value="active">Active</MenuItem>
@@ -464,7 +446,6 @@ const EditProjectForm = () => {
                 )}
               />
 
-              {/* Manager Select (filtered for 'manager' role) */}
               <Controller
                 name="managerId"
                 control={form.control}
@@ -477,7 +458,7 @@ const EditProjectForm = () => {
                       labelId="manager-select-label"
                       label="Project Manager"
                       {...field}
-                      value={field.value || ""} // Ensure default value for Select
+                      value={field.value || ""} 
                     >
                       {managers.length > 0 ? (
                         managers.map((manager) => (

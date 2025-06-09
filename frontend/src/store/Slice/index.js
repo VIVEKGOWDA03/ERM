@@ -23,7 +23,7 @@ export const fetchAllEngineers = createAsyncThunk(
       const response = await axios.get(`${baseUrl}/engineers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data.data; // This data will contain engineers with nested assignments/projects
+      return response.data.data; 
     } catch (error) {
       console.error(
         "Failed to fetch engineers:",
@@ -36,7 +36,6 @@ export const fetchAllEngineers = createAsyncThunk(
   }
 );
 
-// Fetch a single engineer by ID (now includes assignments from backend)
 export const fetchEngineerById = createAsyncThunk(
   "data/fetchEngineerById",
   async (engineerId, { rejectWithValue, getState }) => {
@@ -48,7 +47,7 @@ export const fetchEngineerById = createAsyncThunk(
       const response = await axios.get(`${baseUrl}/engineers/${engineerId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data.data; // This will now contain engineer with nested assignments
+      return response.data.data; 
     } catch (error) {
       console.error(
         `Failed to fetch engineer ${engineerId}:`,
@@ -62,7 +61,6 @@ export const fetchEngineerById = createAsyncThunk(
   }
 );
 
-// Fetch all users (engineers and managers) for general lists/dropdowns
 export const fetchAllUsers = createAsyncThunk(
   "data/fetchAllUsers", // Action type prefix
   async (_, { rejectWithValue, getState }) => {
@@ -71,10 +69,9 @@ export const fetchAllUsers = createAsyncThunk(
       if (!token) return rejectWithValue("No authentication token found.");
 
       const response = await axios.get(`${baseUrl}/engineers/users`, {
-        // Updated to /engineers/all-users as discussed
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data.data; // This data will now contain both engineers and managers
+      return response.data.data; 
     } catch (error) {
       console.error(
         "Failed to fetch all users:",
@@ -93,7 +90,6 @@ const dataSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch All Engineers
       .addCase(fetchAllEngineers.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -106,29 +102,27 @@ const dataSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Fetch Engineer By ID
       .addCase(fetchEngineerById.pending, (state) => {
         state.isLoading = true;
         state.error = null;
-        state.selectedEngineer = null; // Clear previous engineer data
+        state.selectedEngineer = null;
       })
       .addCase(fetchEngineerById.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.selectedEngineer = action.payload; // Store the fetched engineer
+        state.selectedEngineer = action.payload; 
       })
       .addCase(fetchEngineerById.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
         state.selectedEngineer = null;
       })
-      // Fetch All Users (General)
       .addCase(fetchAllUsers.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.users = action.payload; // Store in 'users' property
+        state.users = action.payload;
       })
       .addCase(fetchAllUsers.rejected, (state, action) => {
         state.isLoading = false;

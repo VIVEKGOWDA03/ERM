@@ -52,7 +52,6 @@ const EngineerProfile = () => {
     return <Box sx={{ p: 4, color: 'text.secondary', textAlign: 'center' }}>Engineer profile not found or data not loaded.</Box>;
   }
 
-  // Role-based access control: An engineer can only view their own profile.
   if (currentUser?.role === 'engineer' && String(currentUser._id) !== String(selectedEngineer._id)) {
     return <Box sx={{ p: 4, color: 'error.main', textAlign: 'center' }}>Access Denied. You are not authorized to view this profile.</Box>;
   }
@@ -71,7 +70,6 @@ const EngineerProfile = () => {
           sx={{ bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'grey.300', borderTopLeftRadius: 8, borderTopRightRadius: 8, padding: 3 }}
         />
         <CardContent sx={{ padding: 3, '& > *:not(:last-child)': { mb: 3 } }}>
-          {/* Contact & General Info */}
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
             <Box>
               <Typography variant="caption" display="block" color="text.secondary" gutterBottom>Email</Typography>
@@ -103,7 +101,6 @@ const EngineerProfile = () => {
             </Box>
           )}
 
-          {/* NEW: Engineer's Assignments */}
           {selectedEngineer.role === 'engineer' && selectedEngineer.assignments && selectedEngineer.assignments.length > 0 && (
             <>
               <Divider sx={{ my: 2 }} />

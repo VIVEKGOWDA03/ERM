@@ -11,7 +11,6 @@ import { fetchAllAssignments } from "../../store/Slice/AssignmentSlice";
 import ManagerAnalytics from "./ManagerAnalytics";
 import DashboardShimmer from "../../Compontes/DashboardShimmer";
 
-// --- NO SHADCN IMPORTS HERE ---
 
 const ManagerDashboard = () => {
   const dispatch = useDispatch();
@@ -23,7 +22,6 @@ const ManagerDashboard = () => {
   const { assignments } = useSelector((state) => state.assignments);
 
   useEffect(() => {
-    // Fetch all data when the component mounts if the user is a manager
     if (user && user.role === "manager") {
       dispatch(fetchAllEngineers());
       dispatch(fetchAllProjects());

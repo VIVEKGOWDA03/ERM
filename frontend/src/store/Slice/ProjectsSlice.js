@@ -6,15 +6,13 @@ const baseUrl = "https://erm-kok7.onrender.com/api";
 
 
 const initialState = {
-  projects: [],          // Stores the list of all projects
+  projects: [],          
   selectedProject: null,  
   isLoading: false,       
   error: null,            
 };
 
-// Async Thunks for project-related operations
 
-// Fetch all projects
 export const fetchAllProjects = createAsyncThunk(
   'projects/fetchAllProjects',
   async (_, { rejectWithValue, getState }) => {
@@ -33,7 +31,6 @@ export const fetchAllProjects = createAsyncThunk(
   }
 );
 
-// Fetch a single project by ID
 export const fetchProjectById = createAsyncThunk(
   'projects/fetchProjectById',
   async (projectId, { rejectWithValue, getState }) => {
@@ -52,7 +49,6 @@ export const fetchProjectById = createAsyncThunk(
   }
 );
 
-// Create a new project
 export const createProject = createAsyncThunk(
   'projects/createProject',
   async (projectData, { rejectWithValue, getState }) => {
@@ -71,7 +67,6 @@ export const createProject = createAsyncThunk(
   }
 );
 
-// Update an existing project
 export const updateProject = createAsyncThunk(
   'projects/updateProject',
   async ({ projectId, updatedData }, { rejectWithValue, getState }) => {
@@ -82,7 +77,7 @@ export const updateProject = createAsyncThunk(
       const response = await axios.put(`${baseUrl}/projects/${projectId}`, updatedData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data; // Backend should return the updated project
+      return response.data; 
     } catch (error) {
       console.error(`Failed to update project ${projectId}:`, error.response?.data || error.message);
       return rejectWithValue(error.response?.data?.message || `Failed to update project ${projectId}`);
@@ -90,7 +85,6 @@ export const updateProject = createAsyncThunk(
   }
 );
 
-// Delete a project
 export const deleteProject = createAsyncThunk(
   'projects/deleteProject',
   async (projectId, { rejectWithValue, getState }) => {
@@ -101,7 +95,7 @@ export const deleteProject = createAsyncThunk(
       const response = await axios.delete(`${baseUrl}/projects/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data; // Backend should return success message
+      return response.data;
     } catch (error) {
       console.error(`Failed to delete project ${projectId}:`, error.response?.data || error.message);
       return rejectWithValue(error.response?.data?.message || `Failed to delete project ${projectId}`);
@@ -115,7 +109,6 @@ const projectSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch All Projects
       .addCase(fetchAllProjects.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -128,46 +121,39 @@ const projectSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Fetch Project By ID lifecycle
       .addCase(fetchProjectById.pending, (state) => {
         state.isLoading = true;
         state.error = null;
-        state.selectedProject = null; // Clear previous project data
+        state.selectedProject = null; 
       })
       .addCase(fetchProjectById.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.selectedProject = action.payload; // Store the fetched project
+        state.selectedProject = action.payload;
       })
       .addCase(fetchProjectById.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
         state.selectedProject = null;
       })
-      // Create Project lifecycle
       .addCase(createProject.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(createProject.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Optionally add the new project to the state or refetch all projects
-        // For simplicity and to avoid manual data manipulation here, we often dispatch fetchAllProjects
-        // after a successful creation/update, or let the component handle re-fetching.
-        // If you want to add it directly: state.projects.push(action.payload.data);
+      
         state.error = null;
       })
       .addCase(createProject.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Update Project lifecycle
       .addCase(updateProject.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(updateProject.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Update the project in the projects array if it exists
         const index = state.projects.findIndex(p => p._id === action.payload.data._id);
         if (index !== -1) {
           state.projects[index] = action.payload.data;
@@ -178,14 +164,12 @@ const projectSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Delete Project lifecycle
       .addCase(deleteProject.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(deleteProject.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Remove the deleted project from the projects array
         state.projects = state.projects.filter(p => p._id !== action.meta.arg);
         state.error = null;
       })

@@ -3,19 +3,14 @@ import { useSelector } from 'react-redux';
 import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid
-} from 'recharts'; // Recharts for charting
-import { Card, CardContent, CardHeader, Typography, Box, CircularProgress } from '@mui/material'; // Material-UI for card layout
+} from 'recharts';
+import { Card, CardContent, CardHeader, Typography, Box, CircularProgress } from '@mui/material'; 
 import DashboardShimmer from '../../Compontes/DashboardShimmer';
 
-const COLORS = ['#0088FE', '#FFBB28', '#00C49F', '#FF8042', '#AF19FF']; // Colors for charts
+const COLORS = ['#0088FE', '#FFBB28', '#00C49F', '#FF8042', '#AF19FF']; 
 
 const ManagerAnalytics = () => {
-  // Select data from the correct Redux slices
   const { projects, isLoading: projectsLoading, error: projectsError } = useSelector((state) => state.projects);
-  // We need all engineers and their assignments to calculate utilization.
-  // The assignments loaded into state.assignments are usually 'myAssignments' for engineer dashboard
-  // For manager, fetchAllAssignments should get all assignments, and fetchAllEngineers will get all engineers.
-  // Assuming assignments in state.assignments from `fetchAllAssignments` are comprehensive.
   const { engineers, isLoading: engineersLoading, error: engineersError } = useSelector((state) => state.data);
   const { assignments, isLoading: assignmentsLoading, error: assignmentsError } = useSelector((state) => state.assignments);
 
@@ -27,7 +22,6 @@ const ManagerAnalytics = () => {
 
   useEffect(() => {
     if (projects.length > 0) {
-      // Calculate project status data
       const planningCount = projects.filter(p => p.status === 'planning').length;
       const activeCount = projects.filter(p => p.status === 'active').length;
       const completedCount = projects.filter(p => p.status === 'completed').length;
@@ -40,7 +34,6 @@ const ManagerAnalytics = () => {
     }
 
     if (engineers.length > 0 && assignments.length > 0) {
-      // Calculate engineer utilization data
       const utilizationMap = new Map();
 
       engineers.forEach(engineer => {
@@ -48,21 +41,18 @@ const ManagerAnalytics = () => {
         const now = new Date();
 
         assignments.forEach(assignment => {
-          // Ensure projectId and engineerId are populated objects, not just IDs
           const assignmentEngineerId = assignment.engineerId?._id || assignment.engineerId;
 
           if (String(assignmentEngineerId) === String(engineer._id)) {
             const startDate = new Date(assignment.startDate);
             const endDate = new Date(assignment.endDate);
 
-            // Consider an assignment "active" if its duration overlaps with 'now'
             if (now >= startDate && now <= endDate) {
               totalAllocated += assignment.allocationPercentage;
             }
           }
         });
 
-        // Cap allocation at maxCapacity for display if it exceeds (e.g., due to overlapping assignments)
         const effectiveAllocation = Math.min(totalAllocated, engineer.maxCapacity);
         const available = engineer.maxCapacity - effectiveAllocation;
         const utilizationPercentage = engineer.maxCapacity > 0 ? (effectiveAllocation / engineer.maxCapacity) * 100 : 0;
@@ -71,7 +61,7 @@ const ManagerAnalytics = () => {
         if (utilizationPercentage > 75) {
           status = 'Highly Utilized';
         }
-        if (utilizationPercentage >= 95) { // Often 100% or slightly over is considered overloaded
+        if (utilizationPercentage >= 95) {
           status = 'Overloaded';
         }
         if (utilizationPercentage < 25) {
@@ -81,16 +71,16 @@ const ManagerAnalytics = () => {
 
         utilizationMap.set(engineer._id, {
           name: engineer.name,
-          'Allocated Capacity': effectiveAllocation, // Raw percentage allocated
-          'Max Capacity': engineer.maxCapacity,      // Engineer's max capacity
+          'Allocated Capacity': effectiveAllocation, 
+          'Max Capacity': engineer.maxCapacity,      
           'Available Capacity': available,
-          'Utilization (%)': parseFloat(utilizationPercentage.toFixed(2)), // Percentage utilization
-          status: status // Categorical status
+          'Utilization (%)': parseFloat(utilizationPercentage.toFixed(2)), 
+          status: status 
         });
       });
       setEngineerUtilizationData(Array.from(utilizationMap.values()));
     }
-  }, [projects, engineers, assignments]); // Recalculate if any source data changes
+  }, [projects, engineers, assignments]); 
 
 
   if (isLoading) {
