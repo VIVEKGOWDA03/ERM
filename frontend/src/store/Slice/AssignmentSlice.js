@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
-const baseUrl = "https://erm-kok7.onrender.com/api";
+const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+// const baseUrl = "https://erm-kok7.onrender.com/api";
 
 
 const initialState = {
@@ -63,7 +63,7 @@ export const createAssignment = createAsyncThunk(
       const token = getState().auth.token || sessionStorage.getItem("token");
       if (!token) return rejectWithValue('No authentication token found.');
 
-      const response = await axios.post(`${baseUrl}/assignments`, assignmentData, {
+      const response = await axios.post(`${baseUrl}/assignments/new`, assignmentData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data; 

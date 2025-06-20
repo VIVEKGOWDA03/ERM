@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import * as XLSX from "xlsx"; // Import xlsx library
-import { saveAs } from "file-saver"; // Import file-saver
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
-// MUI Components
 import {
   Table,
   TableBody,
@@ -28,11 +27,12 @@ import {
   Button,
 } from "@mui/material";
 
-import { Download as DownloadIcon } from "@mui/icons-material"; 
+import { Download as DownloadIcon } from "@mui/icons-material";
 
 import { fetchAllAssignments } from "../../store/Slice/AssignmentSlice";
 import { fetchAllProjects } from "../../store/Slice/ProjectsSlice";
 import { fetchAllUsers } from "../../store/Slice/index";
+import DocButton from "../../Ui/DocButton";
 
 const AssignmentListPage = () => {
   const dispatch = useDispatch();
@@ -61,7 +61,7 @@ const AssignmentListPage = () => {
   const [filterStatus, setFilterStatus] = useState("all");
 
   const [page, setPage] = useState(1);
-  const rowsPerPage = 10; 
+  const rowsPerPage = 10;
 
   useEffect(() => {
     if (!currentUser || currentUser.role !== "manager") {
@@ -116,35 +116,42 @@ const AssignmentListPage = () => {
     completed: "success",
   };
 
-  const getStatusBadgeColor = (status) =>
-    statusColorMap[status] || "default";
+  const getStatusBadgeColor = (status) => statusColorMap[status] || "default";
 
   const handleDownloadReport = () => {
     if (filteredAssignments.length === 0) {
-      toast("No data to export.", { icon: 'ℹ️' });
+      toast("No data to export.", { icon: "ℹ️" });
       return;
     }
 
     const dataToExport = filteredAssignments.map((assignment) => ({
-      'Project Name': assignment.projectId?.name || 'N/A',
-      'Engineer Name': assignment.engineerId?.name || 'N/A',
-      'Role': assignment.role,
-      'Allocation (%)': assignment.allocationPercentage,
-      'Start Date': new Date(assignment.startDate).toLocaleDateString(),
-      'End Date': new Date(assignment.endDate).toLocaleDateString(),
-      'Project Status': assignment.projectId?.status?.charAt(0)?.toUpperCase() + assignment.projectId?.status?.slice(1) || 'N/A',
+      "Project Name": assignment.projectId?.name || "N/A",
+      "Engineer Name": assignment.engineerId?.name || "N/A",
+      Role: assignment.role,
+      "Allocation (%)": assignment.allocationPercentage,
+      "Start Date": new Date(assignment.startDate).toLocaleDateString(),
+      "End Date": new Date(assignment.endDate).toLocaleDateString(),
+      "Project Status":
+        assignment.projectId?.status?.charAt(0)?.toUpperCase() +
+          assignment.projectId?.status?.slice(1) || "N/A",
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Assignments Report");
 
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
     const data = new Blob([excelBuffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
     });
 
-    saveAs(data, `Assignments_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+    saveAs(
+      data,
+      `Assignments_Report_${new Date().toISOString().split("T")[0]}.xlsx`
+    );
     toast.success("Assignment report downloaded!");
   };
 
@@ -166,17 +173,41 @@ const AssignmentListPage = () => {
 
   if (error) {
     return (
-      <Box sx={{ p: 4, textAlign: "center", color: "error.main", bgcolor: "background.default", minHeight: "100vh" }}>
+      <Box
+        sx={{
+          p: 4,
+          textAlign: "center",
+          color: "error.main",
+          bgcolor: "background.default",
+          minHeight: "100vh",
+        }}
+      >
         <Typography variant="h6">Error loading data:</Typography>
         <Typography variant="body1">{error}</Typography>
-        <Typography variant="body2" sx={{ mt: 2 }}>Please try again later.</Typography>
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          Please try again later.
+        </Typography>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: { xs: 3, md: 6 }, bgcolor: "background.default", minHeight: "100vh" }}>
-      <Typography variant="h4" sx={{ fontWeight: 700, color: "primary.main", mb: 4, fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem' } }}>
+    <Box
+      sx={{
+        p: { xs: 3, md: 6 },
+        bgcolor: "background.default",
+        minHeight: "100vh",
+      }}
+    >
+      <Typography
+        variant="h4"
+        sx={{
+          fontWeight: 700,
+          color: "primary.main",
+          mb: 4,
+          fontSize: { xs: "1.75rem", sm: "2.25rem", md: "2.5rem" },
+        }}
+      >
         📋 All Assignments
       </Typography>
 
@@ -186,9 +217,9 @@ const AssignmentListPage = () => {
           sx={{
             display: "flex",
             flexDirection: { xs: "column", md: "row" },
-            gap: { xs: 2, md: 3 }, 
+            gap: { xs: 2, md: 3 },
             flexWrap: "wrap",
-            alignItems: "center", 
+            alignItems: "center",
           }}
         >
           <TextField
@@ -196,10 +227,10 @@ const AssignmentListPage = () => {
             variant="outlined"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{ flexGrow: 1, minWidth: { xs: '100%', sm: 200 } }} 
-            size="small" 
+            sx={{ flexGrow: 1, minWidth: { xs: "100%", sm: 200 } }}
+            size="small"
           />
-          <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }} size="small"> 
+          <FormControl sx={{ minWidth: { xs: "100%", sm: 180 } }} size="small">
             <InputLabel>Filter by Project</InputLabel>
             <Select
               value={filterProject}
@@ -214,7 +245,7 @@ const AssignmentListPage = () => {
               ))}
             </Select>
           </FormControl>
-          <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }} size="small">
+          <FormControl sx={{ minWidth: { xs: "100%", sm: 180 } }} size="small">
             <InputLabel>Filter by Engineer</InputLabel>
             <Select
               value={filterEngineer}
@@ -231,7 +262,7 @@ const AssignmentListPage = () => {
                 ))}
             </Select>
           </FormControl>
-          <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }} size="small">
+          <FormControl sx={{ minWidth: { xs: "100%", sm: 180 } }} size="small">
             <InputLabel>Filter by Status</InputLabel>
             <Select
               value={filterStatus}
@@ -244,20 +275,21 @@ const AssignmentListPage = () => {
               <MenuItem value="completed">Completed</MenuItem>
             </Select>
           </FormControl>
-          <Button
+          {/* <Button
             variant="contained"
             color="primary"
             startIcon={<DownloadIcon />}
             onClick={handleDownloadReport}
             sx={{
-              minWidth: { xs: '100%', sm: 'auto' },
-              py: { xs: 1.2, sm: 1.5 }, 
-              px: { xs: 2, sm: 3 }, 
-              fontSize: { xs: '0.875rem', sm: '1rem' } 
+              minWidth: { xs: "100%", sm: "auto" },
+              py: { xs: 1.2, sm: 1.5 },
+              px: { xs: 2, sm: 3 },
+              fontSize: { xs: "0.875rem", sm: "1rem" },
             }}
           >
             Download Report
-          </Button>
+          </Button> */}
+          <DocButton onClick={handleDownloadReport} />
         </Box>
       </Card>
 
@@ -265,45 +297,70 @@ const AssignmentListPage = () => {
         Showing {filteredAssignments.length} assignments
       </Typography>
 
-      <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3, overflowX: 'auto' }}> 
+      <TableContainer
+        component={Paper}
+        sx={{ borderRadius: 2, boxShadow: 3, overflowX: "auto" }}
+      >
         <Table sx={{ minWidth: 1000 }} aria-label="assignments table">
           <TableHead sx={{ bgcolor: "grey.100" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Project</TableCell>
-              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Engineer</TableCell>
-              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Role</TableCell>
-              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Allocation (%)</TableCell>
-              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Start Date</TableCell>
-              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>End Date</TableCell>
-              <TableCell sx={{ fontWeight: "bold", whiteSpace: 'nowrap' }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}>
+                Project
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}>
+                Engineer
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}>
+                Role
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}>
+                Allocation (%)
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}>
+                Start Date
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}>
+                End Date
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}>
+                Status
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedAssignments.length > 0 ? ( 
+            {paginatedAssignments.length > 0 ? (
               paginatedAssignments.map((assignment) => (
                 <TableRow
                   key={assignment._id}
                   sx={{ "&:hover": { backgroundColor: "action.hover" } }}
                 >
-                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{assignment.projectId?.name || "N/A"}</TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{assignment.engineerId?.name || "N/A"}</TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{assignment.role}</TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap' }}>{assignment.allocationPercentage}%</TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    {assignment.projectId?.name || "N/A"}
+                  </TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    {assignment.engineerId?.name || "N/A"}
+                  </TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    {assignment.role}
+                  </TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    {assignment.allocationPercentage}%
+                  </TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
                     {new Date(assignment.startDate).toLocaleDateString()}
                   </TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
                     {new Date(assignment.endDate).toLocaleDateString()}
                   </TableCell>
-                  <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
                     <Chip
                       label={
                         assignment.projectId?.status?.charAt(0)?.toUpperCase() +
-                        assignment.projectId?.status?.slice(1) || "N/A"
+                          assignment.projectId?.status?.slice(1) || "N/A"
                       }
                       size="small"
                       color={getStatusBadgeColor(assignment.projectId?.status)}
-                      sx={{ minWidth: 70 }} 
+                      sx={{ minWidth: 70 }}
                     />
                   </TableCell>
                 </TableRow>
@@ -321,14 +378,14 @@ const AssignmentListPage = () => {
         </Table>
       </TableContainer>
 
-      {filteredAssignments.length > rowsPerPage && ( 
+      {filteredAssignments.length > rowsPerPage && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <Pagination
             count={pageCount}
             page={page}
             onChange={handlePageChange}
             color="primary"
-            size="large" 
+            size="large"
           />
         </Box>
       )}

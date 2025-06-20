@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// const baseUrl =import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
-const baseUrl = "https://erm-kok7.onrender.com/api";
+const baseUrl =import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+// const baseUrl = "https://erm-kok7.onrender.com/api";
 
 
 const initialState = {

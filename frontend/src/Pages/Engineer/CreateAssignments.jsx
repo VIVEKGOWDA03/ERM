@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useForm, Controller } from "react-hook-form"; 
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -12,12 +12,12 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Typography, 
+  Typography,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Box, 
+  Box,
   FormHelperText,
 } from "@mui/material";
 
@@ -25,8 +25,12 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { fetchAllEngineers } from "../../store/Slice";
-import { fetchAllAssignments } from "../../store/Slice/AssignmentSlice";
+import {
+  createAssignment,
+  fetchAllAssignments,
+} from "../../store/Slice/AssignmentSlice";
 import DashboardShimmer from "../../Compontes/DashboardShimmer";
+import { fetchAllProjects } from "../../store/Slice/ProjectsSlice";
 
 const formSchema = z.object({
   engineerId: z.string().nonempty({ message: "Please select an engineer." }),
@@ -60,7 +64,7 @@ const CreateAssignmentForm = () => {
       engineerId: searchParams.get("engineerId") || "",
       projectId: "",
       allocationPercentage: 0,
-      startDate: null, 
+      startDate: null,
       endDate: null,
       role: "",
     },
@@ -160,7 +164,7 @@ const CreateAssignmentForm = () => {
       );
       form.reset();
       dispatch(fetchAllAssignments());
-      dispatch(fetchAllEngineers()); 
+      dispatch(fetchAllEngineers());
       navigate("/manager-dashboard");
     } else {
       toast.error(result.payload || "Failed to create assignment.");

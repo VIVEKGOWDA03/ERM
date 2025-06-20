@@ -53,7 +53,8 @@ const EngineerList = () => {
     navigate(`/engineers/${engineerId}`);
   };
 
-  const handleCreateNewEngineer = () => {
+  const handleCreateNewEngineer = () => { 
+    // toast.error('error');
     navigate('/auth/register'); 
   };
 

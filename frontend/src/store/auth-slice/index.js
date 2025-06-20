@@ -12,8 +12,8 @@ const initialState = {
 };
 
 // Use the API base URL from environment variables
-// const baseUrl = import.meta.env.VITE_API_BASE_URL;
-const baseUrl = "https://erm-kok7.onrender.com/api";
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+// const baseUrl = "https://erm-kok7.onrender.com/api";
 
 
 
