@@ -32,18 +32,7 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-export const registerUserEmp = createAsyncThunk(
-  "/auth/register",
-  async (formData, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(`${baseUrl}/auth/register`, formData, {
-        withCredentials: true,
-      });
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Registration failed");
-    }
-  }
-);
+
 // Async thunk for login
 export const loginUser = createAsyncThunk(
   "/auth/login",

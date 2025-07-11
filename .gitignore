@@ -9,7 +9,7 @@ build/
 # Frontend ignores
 /frontend/node_modules/
 /frontend/dist/
-/frontend/.env
+# /frontend/.env
 
 # Backend ignores
 /backend/node_modules/
